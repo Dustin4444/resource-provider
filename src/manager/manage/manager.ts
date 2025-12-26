@@ -91,7 +91,7 @@ export function getManagerAccountStatus(
 		}
 	}
 
-	managerLog.debug('Manager account status', status);
+	managerLog.debug('Manager account status', objectify(status));
 	return status;
 }
 

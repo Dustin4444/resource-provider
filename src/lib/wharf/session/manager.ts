@@ -16,7 +16,7 @@ export async function getManagerSession(): Promise<Session> {
 	managerLog.debug('Loaded manager account', {
 		account: manager.account,
 		permission: manager.permission,
-		key: PrivateKey.from(manager.key).toPublic()
+		key: String(PrivateKey.from(manager.key).toPublic())
 	});
 	return new Session({
 		chain: {
