@@ -10,7 +10,7 @@
         "@wharfkit/abicache": "^1.2.2",
         "@wharfkit/antelope": "1.1.1",
         "@wharfkit/contract": "^1.2.2-rc1",
-        "@wharfkit/resources": "^1.5.0-rc5",
+        "@wharfkit/resources": "^1.5.1-rc1",
         "@wharfkit/session": "^1.6.0",
         "@wharfkit/signing-request": "^3.2.0",
         "@wharfkit/wallet-plugin-privatekey": "^1.1.0",
@@ -299,7 +299,7 @@
 
     "@wharfkit/contract": ["@wharfkit/contract@1.2.2-rc1", "", { "dependencies": { "@wharfkit/abicache": "^1.2.0", "@wharfkit/antelope": "^1.0.4", "@wharfkit/signing-request": "^3.1.0", "tslib": "^2.1.0" } }, "sha512-o1trLRDcl7cX5ZQgwGg4laqlqs9P+O/rHmZ0+R60mBXelUSTjRx1Q4r7kkN9k6MLzJGZ8FgqImCPTRSSHCBJ0g=="],
 
-    "@wharfkit/resources": ["@wharfkit/resources@1.5.0-rc5", "", { "dependencies": { "@wharfkit/antelope": "^1.1.0", "bn.js": "^4.11.9", "js-big-decimal": "^2.0.7", "tslib": "^2.1.0" } }, "sha512-hWUbpP1mTSefooWZcPjkoeqk1mgiZKpia9yjUHIyez06GbiDQnAjC23bjRwphT+Aqq9UPwFXbEfU35RXezzA1w=="],
+    "@wharfkit/resources": ["@wharfkit/resources@1.5.1-rc1", "", { "dependencies": { "@wharfkit/antelope": "^1.1.0", "bn.js": "^4.11.9", "js-big-decimal": "^2.0.7", "tslib": "^2.1.0" } }, "sha512-XQeKl2sLu7UkPe6TdNp5vabEzssel5fnL9RpaIo1EpnwQ9prC01BQlsOFRb8QVqtBYor472o9oA1ywCKBTeqVQ=="],
 
     "@wharfkit/session": ["@wharfkit/session@1.6.0", "", { "dependencies": { "@wharfkit/abicache": "^1.2.1", "@wharfkit/antelope": "^1.0.11", "@wharfkit/common": "^1.2.0", "@wharfkit/signing-request": "^3.1.0", "pako": "^2.0.4", "tslib": "^2.1.0" } }, "sha512-yrCDcW42Dqd387usVHa3qjnttc65OzHK3REKovzo6wLpQsPn709xzx4J6B9e9Xjb0WC/GQLghtr9EX+T+rRH6w=="],
 

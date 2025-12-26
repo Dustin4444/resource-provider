@@ -43,7 +43,7 @@
 		"@wharfkit/abicache": "^1.2.2",
 		"@wharfkit/antelope": "1.1.1",
 		"@wharfkit/contract": "^1.2.2-rc1",
-		"@wharfkit/resources": "^1.5.0-rc5",
+		"@wharfkit/resources": "^1.5.1-rc1",
 		"@wharfkit/session": "^1.6.0",
 		"@wharfkit/signing-request": "^3.2.0",
 		"@wharfkit/wallet-plugin-privatekey": "^1.1.0",
