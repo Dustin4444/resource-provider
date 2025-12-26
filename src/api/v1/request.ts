@@ -28,8 +28,8 @@ export async function getSignerResources(requester: PermissionLevel) {
 	const response = await getClient().v1.chain.get_account(requester.actor);
 	providerLog.info('data', objectify(response));
 	return {
-		cpu: response.cpu_limit.available,
-		net: response.net_limit.available,
+		cpu: response.cpu_limit.max.subtracting(response.cpu_limit.current_used),
+		net: response.net_limit.max.subtracting(response.net_limit.current_used),
 		ram: response.ram_quota.subtracting(response.ram_usage)
 	};
 }
