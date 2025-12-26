@@ -19,7 +19,7 @@ export const ANTELOPE_NODEOS_API = process.env.ANTELOPE_NODEOS_API;
 export const ANTELOPE_NOOP_CONTRACT = process.env.ANTELOPE_NOOP_CONTRACT ?? 'greymassnoop';
 export const ANTELOPE_SAMPLE_ACCOUNT = process.env.ANTELOPE_SAMPLE_ACCOUNT ?? 'eosio.reserv';
 export const ANTELOPE_SYSTEM_CONTRACT = process.env.ANTELOPE_SYSTEM_CONTRACT ?? 'core.vaulta';
-export const ANTELOPE_SYSTEM_TOKEN = process.env.ANTELOPE_SYSTEM_TOKEN;
+export const ANTELOPE_SYSTEM_TOKEN = process.env.ANTELOPE_SYSTEM_TOKEN ?? '4,A';
 export const ANTELOPE_TOKEN_CONTRACT = process.env.ANTELOPE_TOKEN_CONTRACT ?? 'core.vaulta';
 
 // Feature: Automated Resource Management
