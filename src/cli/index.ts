@@ -13,13 +13,12 @@ import { makeManagerSetupCommand } from './manager/setup';
 import { makeManagerUnauthorizeCommand } from './manager/unauthorize';
 
 import { contractsDatabase } from '$lib/db/models/contract/contracts';
-import { UsageDatabase, defaultTtl } from '$lib/db/models/provider/usage';
+import { usageDatabase } from '$lib/db/models/provider/usage';
 import { createEnvironmentalFile } from '$lib/env';
 
 const services = ['all', 'api', 'manager'];
 
 export function prompt() {
-	const usage = new UsageDatabase();
 	const program = new Command();
 	program
 		.version(version)
@@ -63,28 +62,19 @@ export function prompt() {
 
 	program.commandsGroup('User Management');
 	program
-		.command('expire')
-		.description('Expire all usage records which are older than the specified seconds')
-		.option('-s, --seconds [seconds]', 'Seconds to expire usage records', String(defaultTtl)) // Default to 1 day
-		.action(({ seconds }) => {
-			generalLog.info(`Cleaning usage records older than ${seconds} seconds`);
-			// usage.cleanUsage(seconds);
-		});
-	program
 		.command('reset')
-		.description('Expire all usage records which are older than the specified seconds')
-		.argument('<string>', 'account name to add usage for')
-		.action((name) => {
-			generalLog.info(`Resetting all usage records for ${name}`);
-			// usage.resetUsage(name);
+		.description('Reset all usage tracking records')
+		.action(async () => {
+			generalLog.info('Resetting all usage records');
+			await usageDatabase.resetAllUsage();
 		});
 	program
 		.command('usage')
 		.description('Get the total usage for a specific account name')
 		.argument('<string>', 'account name to query')
 		.action(async (name) => {
-			generalLog.info(`Counting usage for name: ${name}`);
-			// generalLog.info(await usage.getUsage(name));
+			const result = await usageDatabase.getUsage(name);
+			generalLog.info(`Usage for ${name}:`, result);
 		});
 	program.commandsGroup('Database Management');
 	program
@@ -99,15 +89,7 @@ export function prompt() {
 		.description('Force SQLITE3 database vacuum')
 		.action(() => {
 			generalLog.info('Vacuuming database');
-			usage.vacuum();
-		});
-	program.commandsGroup('Debug');
-	program
-		.command('add')
-		.argument('<string>', 'account name to add usage for')
-		.action((name) => {
-			generalLog.info(`Adding usage for name: ${name}`);
-			// usage.addUsage(name, 10);
+			usageDatabase.vacuum();
 		});
 	program.parse(process.argv);
 }
