@@ -1,5 +1,4 @@
-import { Session } from '@wharfkit/session';
-import { WalletPluginPrivateKey } from '@wharfkit/wallet-plugin-privatekey';
+import { Checksum256, PrivateKey, Signature, Transaction } from '@wharfkit/antelope';
 
 import {
 	ANTELOPE_CHAIN_ID,
@@ -9,7 +8,21 @@ import {
 	PROVIDER_ACCOUNT_PRIVATEKEY
 } from 'src/config';
 
-export function getProviderSession(): Session {
+export interface ProviderSessionConfig {
+	chainId: string;
+	nodeosApi: string;
+	accountName: string;
+	accountPermission: string;
+	privateKey: PrivateKey;
+}
+
+let providerConfig: ProviderSessionConfig | null = null;
+
+export function getProviderConfig(): ProviderSessionConfig {
+	if (providerConfig) {
+		return providerConfig;
+	}
+
 	if (
 		!ANTELOPE_CHAIN_ID ||
 		!ANTELOPE_NODEOS_API ||
@@ -21,15 +34,24 @@ export function getProviderSession(): Session {
 			'Provider not configured. Please set the environment variables ANTELOPE_CHAIN_ID, ANTELOPE_NODEOS_API, PROVIDER_ACCOUNT_NAME, PROVIDER_ACCOUNT_PERMISSION, and PROVIDER_ACCOUNT_PRIVATEKEY.'
 		);
 	}
-	return new Session({
-		chain: {
-			id: ANTELOPE_CHAIN_ID,
-			url: ANTELOPE_NODEOS_API
-		},
-		permissionLevel: {
-			actor: PROVIDER_ACCOUNT_NAME,
-			permission: PROVIDER_ACCOUNT_PERMISSION
-		},
-		walletPlugin: new WalletPluginPrivateKey(PROVIDER_ACCOUNT_PRIVATEKEY)
-	});
+
+	providerConfig = {
+		chainId: ANTELOPE_CHAIN_ID,
+		nodeosApi: ANTELOPE_NODEOS_API,
+		accountName: PROVIDER_ACCOUNT_NAME,
+		accountPermission: PROVIDER_ACCOUNT_PERMISSION,
+		privateKey: PrivateKey.from(PROVIDER_ACCOUNT_PRIVATEKEY)
+	};
+
+	return providerConfig;
+}
+
+export function resetProviderConfig(): void {
+	providerConfig = null;
+}
+
+export function signTransaction(transaction: Transaction): Signature {
+	const config = getProviderConfig();
+	const digest = transaction.signingDigest(Checksum256.from(config.chainId));
+	return config.privateKey.signDigest(digest);
 }

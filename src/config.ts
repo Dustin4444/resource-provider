@@ -126,10 +126,24 @@ if (ENABLE_FREE_TRANSACTIONS) {
 	}
 }
 
+// Feature: Resource Provider API - Usage tracking and reset
+export const PROVIDER_USAGE_RESET_CRON = process.env.PROVIDER_USAGE_RESET_CRON ?? '0 0 * * *';
+
+// Feature: Resource Provider API - Resource sufficiency check
+export const PROVIDER_REQUIRE_RESOURCE_NEED = isENVTrue(
+	process.env.PROVIDER_REQUIRE_RESOURCE_NEED ?? 'true'
+);
+export const PROVIDER_MIN_CPU_US = process.env.PROVIDER_MIN_CPU_US
+	? Number(process.env.PROVIDER_MIN_CPU_US)
+	: 50000;
+export const PROVIDER_MIN_NET_BYTES = process.env.PROVIDER_MIN_NET_BYTES
+	? Number(process.env.PROVIDER_MIN_NET_BYTES)
+	: 50000;
+
 // Feature: Resource Provider API - Cosign transactions to fee-based resources
 export const ENABLE_PAID_TRANSACTIONS = isENVTrue(process.env.ENABLE_PAID_TRANSACTIONS ?? 'false');
 export const PROVIDER_PAID_TRANSACTIONS_ASSET =
-	process.env.ANTELOPE_SYSTEM_TOKEN ?? process.env.PROVIDER_PAID_TRANSACTIONS_ASSET;
+	process.env.PROVIDER_PAID_TRANSACTIONS_ASSET ?? process.env.ANTELOPE_SYSTEM_TOKEN;
 export const PROVIDER_PAID_TRANSACTIONS_MINIMUM_FEE =
 	process.env.PROVIDER_PAID_TRANSACTIONS_MINIMUM_FEE;
 

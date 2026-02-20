@@ -1,47 +1,45 @@
+import { eq, sql } from 'drizzle-orm';
+
+import { database } from '$lib/db';
 import { AbstractDatabase } from '$lib/db/abstract';
 
-export interface Usage {
-	id?: number;
+export interface AccountUsage {
 	account: string;
-	usage: number;
+	cpu: number;
+	net: number;
 }
-
-export const defaultTtl = 60 * 60 * 24; // Default TTL of 1 day
 
 export class UsageDatabase extends AbstractDatabase {
-	private ttl: number;
+	async getUsage(account: string): Promise<AccountUsage> {
+		const result = await database
+			.select()
+			.from(this.schema.usage)
+			.where(eq(this.schema.usage.account, account))
+			.limit(1);
 
-	constructor(ttl = defaultTtl) {
-		super();
-		this.ttl = ttl;
+		if (result.length === 0) {
+			return { account, cpu: 0, net: 0 };
+		}
+
+		return result[0];
 	}
 
-	// async init() {
-	// 	return this.db.run(
-	// 		'CREATE TABLE IF NOT EXISTS usage (id INTEGER PRIMARY KEY AUTOINCREMENT, account TEXT, usage INTEGER DEFAULT 0, ts INTEGER DEFAULT (unixepoch()))'
-	// 	);
-	// }
+	async incrementUsage(account: string, cpu: number, net: number): Promise<void> {
+		await database
+			.insert(this.schema.usage)
+			.values({ account, cpu, net })
+			.onConflictDoUpdate({
+				target: this.schema.usage.account,
+				set: {
+					cpu: sql`${this.schema.usage.cpu} + ${cpu}`,
+					net: sql`${this.schema.usage.net} + ${net}`
+				}
+			});
+	}
 
-	// async getUsage(account: string): Promise<{ usage: number }> {
-	// 	return { usage: 1 };
-	// 	// return this.db
-	// 	// 	.query(`SELECT COALESCE(sum(usage), 0) as usage FROM usage WHERE account = ?`)
-	// 	// 	.get(account) as { usage: number };
-	// }
-
-	// async addUsage(account: string, usage: number) {
-	// 	this.cleanUsage(); // Clean up old usage before adding new
-	// 	// return this.db.run(`INSERT INTO usage (account, usage) VALUES (?, ?) RETURNING id`, [
-	// 	// 	account,
-	// 	// 	usage
-	// 	// ]);
-	// }
-
-	// async resetUsage(account: string) {
-	// 	// return this.db.prepare(`DELETE FROM usage WHERE account = ?`).run(account);
-	// }
-
-	// async cleanUsage(ttl: number = this.ttl) {
-	// 	// return this.db.prepare(`DELETE FROM usage WHERE ts < (unixepoch() - ?) LIMIT 100`).run(ttl);
-	// }
+	async resetAllUsage(): Promise<void> {
+		await database.delete(this.schema.usage);
+	}
 }
+
+export const usageDatabase = new UsageDatabase();

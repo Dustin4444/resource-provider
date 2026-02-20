@@ -5,11 +5,9 @@ import { server } from '../src/provider';
 
 import { PROVIDER_ACCOUNT_NAME, PROVIDER_ACCOUNT_PERMISSION } from 'src/config';
 
-// Transfer from the signer to null.vaulta
 const mockRequest =
 	'esr://gmNgZGBY1mTC_MoglIGBIVzX5uxZRqAQGDBBaWeYABgAVcL4LK7-wSBaKSi1OL-0KDlVoaAovywzJbVIoSS1uEShpCgxrzgxuSQzPw-oBQA';
 
-// Transfer from the signer to null.vaulta using the `greymassfuel` account
 const mockRequestUsingCosigner =
 	'esr://gmNgZGBY1mTC_MoglIGBIVzX5uxZxgkbT908WOr7GCjAsOKtkZEzsgADUCUjAwSwuPoHg2iloNTi_NKi5FSFgqL8ssyU1CKFktTiEoWSosS84sTkksz8PKAWAA';
 
@@ -23,20 +21,9 @@ const mockRequestPayload = {
 	request: mockRequest
 };
 
-// const mockPackedPayload = {
-// 	signer: mockSigner,
-// 	request: mockRequest
-// };
-
-// const mockTransactionPayload = {
-// 	signer: mockSigner,
-// 	request: mockRequest
-// };
-
 let app: Elysia;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function makeRequest(path: string, data: any) {
+function makeRequest(path: string, data: unknown) {
 	return new Request(`http://localhost${path}`, {
 		method: 'POST',
 		body: JSON.stringify(data),
@@ -46,7 +33,9 @@ function makeRequest(path: string, data: any) {
 
 describe('v1/resource_provider/request_transaction', () => {
 	beforeAll(() => {
-		app = server();
+		const instance = server();
+		expect(instance).toBeDefined();
+		app = instance!;
 	});
 	describe('signer validation', () => {
 		it('requires signer', async () => {

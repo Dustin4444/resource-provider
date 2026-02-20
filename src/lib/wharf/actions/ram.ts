@@ -7,8 +7,7 @@ import { ANTELOPE_SYSTEM_CONTRACT } from 'src/config';
 
 export async function addBuyRAMBytesAction(
 	transaction: Transaction,
-	cosigner: PermissionLevel,
-	requestor: PermissionLevel,
+	requester: PermissionLevel,
 	bytes: UInt64
 ): Promise<Transaction> {
 	const systemContract = await getContract(ANTELOPE_SYSTEM_CONTRACT);
@@ -17,11 +16,11 @@ export async function addBuyRAMBytesAction(
 		systemContract.action(
 			'buyrambytes',
 			{
-				payer: cosigner.actor,
-				receiver: requestor.actor,
+				payer: requester.actor,
+				receiver: requester.actor,
 				bytes
 			},
-			{ authorization: [cosigner] }
+			{ authorization: [requester] }
 		)
 	);
 	return modified;

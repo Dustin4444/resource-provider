@@ -19,3 +19,9 @@ export const manager = sqliteTable('manager', {
 	permission: text('permission').notNull(),
 	key: text('key').notNull()
 });
+
+export const usage = sqliteTable('usage', {
+	account: text('account').primaryKey(),
+	cpu: integer('cpu').notNull().default(0),
+	net: integer('net').notNull().default(0)
+});
