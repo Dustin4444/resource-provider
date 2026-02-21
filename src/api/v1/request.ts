@@ -4,7 +4,7 @@ import { PowerUpState } from '@wharfkit/resources';
 import type { ResolvedSigningRequest, SigningRequest } from '@wharfkit/signing-request';
 import type { Static } from 'elysia';
 
-import { v1ProviderRequestBody, v1ResponseResources } from '$api/v1/types';
+import { v1ProviderRequestBody } from '$api/v1/types';
 import type { v1ResponseTypes } from '$api/v1/types';
 import { usageDatabase } from '$lib/db/models/provider/usage';
 import { providerLog } from '$lib/logger';
@@ -13,6 +13,7 @@ import { addFeeAction } from '$lib/wharf/actions/fee';
 import { addNoopAction } from '$lib/wharf/actions/noop';
 import { addBuyRAMBytesAction } from '$lib/wharf/actions/ram';
 import { getClient } from '$lib/wharf/client';
+import { invalidateContractCache } from '$lib/wharf/contracts';
 import { getResourcesClient } from '$lib/wharf/resources';
 import { signTransaction } from '$lib/wharf/session/provider';
 import { createSigningRequest } from '$lib/wharf/signing-request';
@@ -29,6 +30,23 @@ import {
 	PROVIDER_PAID_TRANSACTIONS_MINIMUM_FEE,
 	PROVIDER_REQUIRE_RESOURCE_NEED
 } from 'src/config';
+
+const ABI_ERROR_PATTERNS = [
+	/Missing ABI definition for (\S+)/,
+	/Missing type for action (\S+?):/,
+	/Contract \((\S+?)\) does not have an action named/,
+	/does not exist on the ABI provided/,
+	/Encoding error at /
+];
+
+function getStaleContract(error: unknown): string | undefined {
+	const message = error instanceof Error ? error.message : String(error);
+	for (const pattern of ABI_ERROR_PATTERNS) {
+		const match = message.match(pattern);
+		if (match) return match[1];
+	}
+	return undefined;
+}
 
 interface ResourceNeeds {
 	cpu: number;
@@ -235,22 +253,15 @@ function calculateTotalFee(costs: ResourceCosts): Asset {
 	return total;
 }
 
-async function handleRequest(
+async function processRequest(
 	request: SigningRequest,
-	requester: PermissionLevel
+	requester: PermissionLevel,
+	cosigner: PermissionLevel
 ): Promise<v1ResponseTypes> {
-	const cosigner = PermissionLevel.from({
-		actor: PROVIDER_ACCOUNT_NAME,
-		permission: PROVIDER_ACCOUNT_PERMISSION
-	});
-
-	validateRequest(cosigner, request);
-	validateRequester(cosigner, requester);
-
 	let accountData: API.v1.AccountObject;
 	try {
 		accountData = await getSignerAccountData(requester);
-	} catch (error) {
+	} catch {
 		throw new Error(`Unable to retrieve account data for ${requester.actor}.`);
 	}
 	checkResourceSufficiency(accountData);
@@ -331,5 +342,24 @@ export async function request({
 }): Promise<v1ResponseTypes> {
 	const signingRequest = await createSigningRequest(body);
 	const requester = resolvePermissionLevel(body.signer);
-	return handleRequest(signingRequest, requester);
+	const cosigner = PermissionLevel.from({
+		actor: PROVIDER_ACCOUNT_NAME,
+		permission: PROVIDER_ACCOUNT_PERMISSION
+	});
+
+	validateRequest(cosigner, signingRequest);
+	validateRequester(cosigner, requester);
+
+	try {
+		return await processRequest(signingRequest, requester, cosigner);
+	} catch (error) {
+		const staleContract = getStaleContract(error);
+		if (!staleContract) throw error;
+		providerLog.warn('Stale ABI detected, retrying with fresh contract', {
+			error: String(error),
+			contract: staleContract
+		});
+		invalidateContractCache(staleContract);
+		return processRequest(signingRequest, requester, cosigner);
+	}
 }

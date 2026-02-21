@@ -12,7 +12,6 @@ import { makeManagerRunCommand } from './manager/run';
 import { makeManagerSetupCommand } from './manager/setup';
 import { makeManagerUnauthorizeCommand } from './manager/unauthorize';
 
-import { contractsDatabase } from '$lib/db/models/contract/contracts';
 import { usageDatabase } from '$lib/db/models/provider/usage';
 import { createEnvironmentalFile } from '$lib/env';
 
@@ -77,13 +76,6 @@ export function prompt() {
 			generalLog.info(`Usage for ${name}:`, result);
 		});
 	program.commandsGroup('Database Management');
-	program
-		.command('flush')
-		.description('Flush the cached ABIs from the database')
-		.action(async () => {
-			generalLog.info('Flushing cached ABIs from the database');
-			await contractsDatabase.clear();
-		});
 	program
 		.command('vacuum')
 		.description('Force SQLITE3 database vacuum')

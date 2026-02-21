@@ -9,11 +9,6 @@ export const users = sqliteTable('accounts', {
 	max_fee: text('max_fee').notNull()
 });
 
-export const contracts = sqliteTable('contracts', {
-	contract: text('contract').primaryKey(),
-	abi: text('abi').notNull()
-});
-
 export const manager = sqliteTable('manager', {
 	account: text('account').primaryKey(),
 	permission: text('permission').notNull(),
