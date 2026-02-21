@@ -10,7 +10,6 @@ export const SERVICE_INFO_LOG = process.env.SERVICE_INFO_LOG ?? './info.log';
 export const SERVICE_LOG_LEVEL = process.env.SERVICE_LOG_LEVEL ?? 'info';
 
 // Database Configuration
-export const DATABASE_ADAPTER = process.env.DATABASE_ADAPTER ?? 'sqlite';
 export const DATABASE_FILE = process.env.DATABASE_FILE ?? 'resource-provider.db';
 
 // Chain Configuration
@@ -31,9 +30,6 @@ export const MANAGER_CRONJOB = process.env.MANAGER_CRONJOB ?? '0/10 * * * * *'; 
 export const MANAGER_BUYRAM_ENABLED = isENVTrue(process.env.MANAGER_BUYRAM_ENABLED ?? 'true');
 export const MANAGER_RAM_MINIMUM_KB = process.env.MANAGER_RAM_MINIMUM_KB
 	? Number(process.env.MANAGER_RAM_MINIMUM_KB)
-	: 1;
-export const MANAGER_BUYRAM_INCREMENT_KB = process.env.MANAGER_BUYRAM_INCREMENT_KB
-	? Number(process.env.MANAGER_BUYRAM_INCREMENT_KB)
 	: 1;
 export const MANAGER_BUYRAM_ACTION = process.env.MANAGER_BUYRAM_ACTION ?? 'buyrambytes';
 export const MANAGER_MIN_MS = process.env.MANAGER_MIN_MS ? Number(process.env.MANAGER_MIN_MS) : 5;
@@ -142,8 +138,6 @@ export const PROVIDER_MIN_NET_BYTES = process.env.PROVIDER_MIN_NET_BYTES
 
 // Feature: Resource Provider API - Cosign transactions to fee-based resources
 export const ENABLE_PAID_TRANSACTIONS = isENVTrue(process.env.ENABLE_PAID_TRANSACTIONS ?? 'false');
-export const PROVIDER_PAID_TRANSACTIONS_ASSET =
-	process.env.PROVIDER_PAID_TRANSACTIONS_ASSET ?? process.env.ANTELOPE_SYSTEM_TOKEN;
 export const PROVIDER_PAID_TRANSACTIONS_MINIMUM_FEE =
 	process.env.PROVIDER_PAID_TRANSACTIONS_MINIMUM_FEE;
 

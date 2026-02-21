@@ -39,12 +39,12 @@ export async function makeUpdateAuthAction(
 	return systemContract.action('updateauth', params);
 }
 
-export async function makeLinkAuthAction(manager: Session, action: string) {
+export async function makeLinkAuthAction(session: Session, code: string, action: string) {
 	const systemContract = await getContract(ANTELOPE_SYSTEM_CONTRACT);
 	const params = {
-		account: manager.actor,
-		requirement: manager.permission,
-		code: ANTELOPE_SYSTEM_CONTRACT,
+		account: session.actor,
+		requirement: session.permission,
+		code,
 		type: action
 	};
 	return systemContract.action('linkauth', params);
@@ -59,11 +59,11 @@ export async function makeDeleteAuthAction(manager: Session) {
 	return systemContract.action('deleteauth', params);
 }
 
-export async function makeUnlinkAuthAction(manager: Session, action: string) {
+export async function makeUnlinkAuthAction(session: Session, code: string, action: string) {
 	const systemContract = await getContract(ANTELOPE_SYSTEM_CONTRACT);
 	const params = {
-		account: manager.actor,
-		code: ANTELOPE_SYSTEM_CONTRACT,
+		account: session.actor,
+		code,
 		type: action
 	};
 	return systemContract.action('unlinkauth', params);

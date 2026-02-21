@@ -6,7 +6,12 @@ import { makeDeleteAuthAction, makeUnlinkAuthAction } from '$lib/manager/setup';
 import { objectify } from '$lib/utils';
 import { getClient } from '$lib/wharf/client';
 import { getManagerSession } from '$lib/wharf/session/manager';
-import { ANTELOPE_CHAIN_ID, explorers, MANAGER_BUYRAM_ACTION } from 'src/config';
+import {
+	ANTELOPE_CHAIN_ID,
+	ANTELOPE_SYSTEM_CONTRACT,
+	explorers,
+	MANAGER_BUYRAM_ACTION
+} from 'src/config';
 import { getManagerAccountStatus } from 'src/manager/manage/manager';
 
 export function makeManagerUnauthorizeCommand() {
@@ -21,10 +26,12 @@ export function makeManagerUnauthorizeCommand() {
 
 			const actions = [];
 			if (!status.requiresLinkAuthPowerup) {
-				actions.push(await makeUnlinkAuthAction(manager, 'powerup'));
+				actions.push(await makeUnlinkAuthAction(manager, ANTELOPE_SYSTEM_CONTRACT, 'powerup'));
 			}
 			if (!status.requiresLinkAuthBuyRAM) {
-				actions.push(await makeUnlinkAuthAction(manager, MANAGER_BUYRAM_ACTION));
+				actions.push(
+					await makeUnlinkAuthAction(manager, ANTELOPE_SYSTEM_CONTRACT, MANAGER_BUYRAM_ACTION)
+				);
 			}
 			if (!status.requiresUpdateAuth) {
 				actions.push(await makeDeleteAuthAction(manager));
