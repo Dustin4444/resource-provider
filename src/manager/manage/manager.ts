@@ -44,7 +44,7 @@ export function getManagerAccountStatus(
 
 	const ramAvailable = data.ram_quota.subtracting(data.ram_usage);
 	const ramMinimum = Int64.from(MANAGER_RAM_MINIMUM_KB).multiplying(1000);
-	managerLog.debug(
+	managerLog.silly(
 		'Manager account RAM state',
 		objectify({
 			quota: data.ram_quota,
@@ -58,7 +58,7 @@ export function getManagerAccountStatus(
 	}
 
 	status.existingPermission = data.permissions.find((p) => p.perm_name.equals(manager.permission));
-	managerLog.debug('Manager account permissions', objectify(data.permissions));
+	managerLog.silly('Manager account permissions', objectify(data.permissions));
 
 	// Ensure the matching permission name exists
 	if (!status.existingPermission) {
@@ -91,7 +91,7 @@ export function getManagerAccountStatus(
 		}
 	}
 
-	managerLog.debug('Manager account status', objectify(status));
+	managerLog.silly('Manager account status', objectify(status));
 	return status;
 }
 
@@ -110,10 +110,14 @@ export async function manageManagerAccount(manager: Session, context: ManagerCon
 		process.exit();
 	}
 	if (status.requiresAdditionalRAM) {
+		const ramAvailable = data.ram_quota.subtracting(data.ram_usage);
+		const ramMinimum = Int64.from(MANAGER_RAM_MINIMUM_KB).multiplying(1000);
+		const ramDeficit = ramMinimum.subtracting(ramAvailable);
 		managerLog.info('Adding buyram action for manager account.', {
-			account: manager.actor
+			account: manager.actor,
+			bytes: ramDeficit
 		});
-		actions.push(await makeBuyRamBytesSelfAction(manager));
+		actions.push(await makeBuyRamBytesSelfAction(manager, ramDeficit));
 	}
 	const managerAccount = ManagedAccount.from({
 		account: MANAGER_ACCOUNT_NAME,

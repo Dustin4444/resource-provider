@@ -1,4 +1,5 @@
-import { Checksum256, PrivateKey, Signature, Transaction } from '@wharfkit/antelope';
+import { Checksum256, PrivateKey, Session, Signature, Transaction } from '@wharfkit/session';
+import { WalletPluginPrivateKey } from '@wharfkit/wallet-plugin-privatekey';
 
 import {
 	ANTELOPE_CHAIN_ID,
@@ -8,19 +9,11 @@ import {
 	PROVIDER_ACCOUNT_PRIVATEKEY
 } from 'src/config';
 
-export interface ProviderSessionConfig {
-	chainId: string;
-	nodeosApi: string;
-	accountName: string;
-	accountPermission: string;
-	privateKey: PrivateKey;
-}
+let providerSession: Session | null = null;
 
-let providerConfig: ProviderSessionConfig | null = null;
-
-export function getProviderConfig(): ProviderSessionConfig {
-	if (providerConfig) {
-		return providerConfig;
+export function getProviderSession(): Session {
+	if (providerSession) {
+		return providerSession;
 	}
 
 	if (
@@ -35,23 +28,24 @@ export function getProviderConfig(): ProviderSessionConfig {
 		);
 	}
 
-	providerConfig = {
-		chainId: ANTELOPE_CHAIN_ID,
-		nodeosApi: ANTELOPE_NODEOS_API,
-		accountName: PROVIDER_ACCOUNT_NAME,
-		accountPermission: PROVIDER_ACCOUNT_PERMISSION,
-		privateKey: PrivateKey.from(PROVIDER_ACCOUNT_PRIVATEKEY)
-	};
+	providerSession = new Session({
+		chain: {
+			id: ANTELOPE_CHAIN_ID,
+			url: ANTELOPE_NODEOS_API
+		},
+		permissionLevel: {
+			actor: PROVIDER_ACCOUNT_NAME,
+			permission: PROVIDER_ACCOUNT_PERMISSION
+		},
+		walletPlugin: new WalletPluginPrivateKey(PROVIDER_ACCOUNT_PRIVATEKEY)
+	});
 
-	return providerConfig;
-}
-
-export function resetProviderConfig(): void {
-	providerConfig = null;
+	return providerSession;
 }
 
 export function signTransaction(transaction: Transaction): Signature {
-	const config = getProviderConfig();
-	const digest = transaction.signingDigest(Checksum256.from(config.chainId));
-	return config.privateKey.signDigest(digest);
+	const session = getProviderSession();
+	const digest = transaction.signingDigest(Checksum256.from(session.chain.id));
+	const privateKey = PrivateKey.from(session.walletPlugin.data.privateKey);
+	return privateKey.signDigest(digest);
 }

@@ -68,6 +68,15 @@ MANAGER_ACCOUNT_NAME=
 # The amount of NET (in kilobytes) the management account should powerup for itself when needed
 # MANAGER_INC_KB=10
 
+# Enable self-management of the manager account's own resources (default: true)
+# ENABLE_SELF_MANAGEMENT=true
+
+# Maximum payment per self-management powerup
+# MANAGER_MAX_FEE=0.1000
+
+# The interval at which self-management will evaluate and act upon its own resource needs (cron style)
+# MANAGER_SELF_CRONJOB='0/30 * * * * *'
+
 #######################################################
 ### PROVIDER CONFIGURATION
 #######################################################

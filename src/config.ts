@@ -1,4 +1,4 @@
-import { isENVTrue } from '$lib/utils';
+import { isENVFalse, isENVTrue } from '$lib/utils';
 
 // Base Configuration
 export const ENVIRONMENT = process.env.ENVIRONMENT ?? 'production';
@@ -159,6 +159,11 @@ if (ENABLE_PAID_TRANSACTIONS) {
 		);
 	}
 }
+
+// Feature: Self-Management (auto-PowerUp for the service's own account)
+export const ENABLE_SELF_MANAGEMENT = !isENVFalse(process.env.ENABLE_SELF_MANAGEMENT ?? 'true');
+export const MANAGER_SELF_CRONJOB = process.env.MANAGER_SELF_CRONJOB ?? '0/30 * * * * *';
+export const MANAGER_MAX_FEE = process.env.MANAGER_MAX_FEE ?? '0.1000';
 
 export const explorers: Record<string, string> = {
 	aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906: 'https://unicove.com',

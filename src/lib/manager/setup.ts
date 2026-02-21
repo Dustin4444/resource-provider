@@ -1,7 +1,7 @@
 import { API, Int64, KeyWeight, PrivateKey, Session } from '@wharfkit/session';
 
 import { getContract } from '$lib/wharf/contracts';
-import { ANTELOPE_SYSTEM_CONTRACT, MANAGER_RAM_MINIMUM_KB } from 'src/config';
+import { ANTELOPE_SYSTEM_CONTRACT } from 'src/config';
 
 export async function makeUpdateAuthAction(
 	manager: Session,
@@ -69,12 +69,12 @@ export async function makeUnlinkAuthAction(manager: Session, action: string) {
 	return systemContract.action('unlinkauth', params);
 }
 
-export async function makeBuyRamBytesSelfAction(manager: Session) {
+export async function makeBuyRamBytesSelfAction(manager: Session, ramBytes: Int64) {
 	const systemContract = await getContract(ANTELOPE_SYSTEM_CONTRACT);
 	const params = {
 		payer: manager.actor,
 		receiver: manager.actor,
-		bytes: Int64.from(MANAGER_RAM_MINIMUM_KB).multiplying(1000)
+		bytes: ramBytes
 	};
 	return systemContract.action('buyrambytes', params);
 }

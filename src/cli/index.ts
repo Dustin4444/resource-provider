@@ -4,6 +4,7 @@ import { version } from '../../package.json';
 import { generalLog } from '../lib/logger';
 import { manager } from '../manager';
 import { server } from '../provider';
+import { selfManagement } from '../self-management';
 
 import { makeManagerAddCommand } from './manager/add';
 import { makeManagerListCommand } from './manager/list';
@@ -46,6 +47,7 @@ export function prompt() {
 			if (service === 'all' || service === 'manager') {
 				manager();
 			}
+			selfManagement();
 		});
 
 	program.commandsGroup('Resource Manager');
