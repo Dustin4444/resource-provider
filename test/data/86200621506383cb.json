@@ -1,0 +1,219 @@
+{
+	"request": {
+		"url": "https://jungle4.greymass.com/v1/chain/compute_transaction",
+		"body": {
+			"transaction": {
+				"signatures": [],
+				"compression": 1,
+				"packed_context_free_data": "789c63000000010001",
+				"packed_trx": "789c9bf76a66669285d8ab1b4f188080294073ae84f4cbaba9200e0390c32860742e5c75fbcbb520becf3303570686654d26ccaf0c4281fc705d9bb36719059c386e1e2cf57d0c52b1e2ad919133b200035025230304b0b8fa078368a5a0d4e2fcd2a2e4548582a2fcb2cc94d4228592d4e2128592a2c4bce2c4e492ccfc3c060007c62e73"
+			}
+		}
+	},
+	"status": 200,
+	"headers": {
+		"access-control-allow-headers": "X-Requested-With,Accept,Content-Type,Origin",
+		"access-control-allow-methods": "GET, POST, OPTIONS",
+		"access-control-allow-origin": "*",
+		"cf-cache-status": "DYNAMIC",
+		"cf-ray": "9d17eaa7cc0a7d12-SJC",
+		"connection": "keep-alive",
+		"content-encoding": "br",
+		"content-type": "application/json",
+		"date": "Sat, 21 Feb 2026 17:20:50 GMT",
+		"host": "jungle4.greymass.com",
+		"nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+		"report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=ctjmMoEEL4fYSaVjQ7HsjNnVTPVvDtb1n%2FdNoQhfRt1mP9AKvCTiXSFwQbE8MBNX%2B5hfRInLkOtPAI0uQF2iCElbvXUpQhRmtv0CHVPh8RU4SSE%3D\"}]}",
+		"server": "cloudflare",
+		"transfer-encoding": "chunked"
+	},
+	"body": {
+		"transaction_id": "4f0ea2f78466b5b95da6efae58e94a950589963695be97545ac72706d75319da",
+		"processed": {
+			"id": "4f0ea2f78466b5b95da6efae58e94a950589963695be97545ac72706d75319da",
+			"block_num": 251672678,
+			"block_time": "2026-02-21T17:20:50.500",
+			"producer_block_id": null,
+			"receipt": {
+				"status": "executed",
+				"cpu_usage_us": 139,
+				"net_usage_words": 21
+			},
+			"elapsed": 139,
+			"net_usage": 168,
+			"scheduled": false,
+			"action_traces": [
+				{
+					"action_ordinal": 1,
+					"creator_action_ordinal": 0,
+					"closest_unnotified_ancestor_action_ordinal": 0,
+					"receipt": {
+						"receiver": "greymassnoop",
+						"act_digest": "0991eaec1cd20b6361be51ec9a9bae7adfb0fb0ebe4d2502639da86edb9e0d5c",
+						"global_sequence": 327953185,
+						"recv_sequence": 21987,
+						"auth_sequence": [["providertst1", 17]],
+						"code_sequence": 0,
+						"abi_sequence": 1
+					},
+					"receiver": "greymassnoop",
+					"act": {
+						"account": "greymassnoop",
+						"name": "noop",
+						"authorization": [
+							{
+								"actor": "providertst1",
+								"permission": "cosign"
+							}
+						],
+						"data": "",
+						"hex_data": ""
+					},
+					"context_free": false,
+					"elapsed": 10,
+					"console": "",
+					"trx_id": "4f0ea2f78466b5b95da6efae58e94a950589963695be97545ac72706d75319da",
+					"block_num": 251672678,
+					"block_time": "2026-02-21T17:20:50.500",
+					"producer_block_id": null,
+					"account_ram_deltas": [],
+					"except": null,
+					"error_code": null,
+					"return_value_hex_data": ""
+				},
+				{
+					"action_ordinal": 2,
+					"creator_action_ordinal": 0,
+					"closest_unnotified_ancestor_action_ordinal": 0,
+					"receipt": {
+						"receiver": "eosio.token",
+						"act_digest": "15611cbb525909caa0592bf54fac6db8d9c16132a48ab22a455140d94b00003a",
+						"global_sequence": 327953186,
+						"recv_sequence": 8612969,
+						"auth_sequence": [["wharfkit1111", 3152]],
+						"code_sequence": 4,
+						"abi_sequence": 5
+					},
+					"receiver": "eosio.token",
+					"act": {
+						"account": "eosio.token",
+						"name": "transfer",
+						"authorization": [
+							{
+								"actor": "wharfkit1111",
+								"permission": "active"
+							}
+						],
+						"data": {
+							"from": "wharfkit1111",
+							"to": "eosio",
+							"quantity": "0.0001 EOS",
+							"memo": "Resource provider test transaction"
+						},
+						"hex_data": "104208d9c1754de30000000000ea3055010000000000000004454f5300000000225265736f757263652070726f76696465722074657374207472616e73616374696f6e"
+					},
+					"context_free": false,
+					"elapsed": 39,
+					"console": "",
+					"trx_id": "4f0ea2f78466b5b95da6efae58e94a950589963695be97545ac72706d75319da",
+					"block_num": 251672678,
+					"block_time": "2026-02-21T17:20:50.500",
+					"producer_block_id": null,
+					"account_ram_deltas": [],
+					"except": null,
+					"error_code": null,
+					"return_value_hex_data": ""
+				},
+				{
+					"action_ordinal": 3,
+					"creator_action_ordinal": 2,
+					"closest_unnotified_ancestor_action_ordinal": 2,
+					"receipt": {
+						"receiver": "wharfkit1111",
+						"act_digest": "15611cbb525909caa0592bf54fac6db8d9c16132a48ab22a455140d94b00003a",
+						"global_sequence": 327953187,
+						"recv_sequence": 851,
+						"auth_sequence": [["wharfkit1111", 3153]],
+						"code_sequence": 4,
+						"abi_sequence": 5
+					},
+					"receiver": "wharfkit1111",
+					"act": {
+						"account": "eosio.token",
+						"name": "transfer",
+						"authorization": [
+							{
+								"actor": "wharfkit1111",
+								"permission": "active"
+							}
+						],
+						"data": {
+							"from": "wharfkit1111",
+							"to": "eosio",
+							"quantity": "0.0001 EOS",
+							"memo": "Resource provider test transaction"
+						},
+						"hex_data": "104208d9c1754de30000000000ea3055010000000000000004454f5300000000225265736f757263652070726f76696465722074657374207472616e73616374696f6e"
+					},
+					"context_free": false,
+					"elapsed": 2,
+					"console": "",
+					"trx_id": "4f0ea2f78466b5b95da6efae58e94a950589963695be97545ac72706d75319da",
+					"block_num": 251672678,
+					"block_time": "2026-02-21T17:20:50.500",
+					"producer_block_id": null,
+					"account_ram_deltas": [],
+					"except": null,
+					"error_code": null,
+					"return_value_hex_data": ""
+				},
+				{
+					"action_ordinal": 4,
+					"creator_action_ordinal": 2,
+					"closest_unnotified_ancestor_action_ordinal": 2,
+					"receipt": {
+						"receiver": "eosio",
+						"act_digest": "15611cbb525909caa0592bf54fac6db8d9c16132a48ab22a455140d94b00003a",
+						"global_sequence": 327953188,
+						"recv_sequence": 252223620,
+						"auth_sequence": [["wharfkit1111", 3154]],
+						"code_sequence": 4,
+						"abi_sequence": 5
+					},
+					"receiver": "eosio",
+					"act": {
+						"account": "eosio.token",
+						"name": "transfer",
+						"authorization": [
+							{
+								"actor": "wharfkit1111",
+								"permission": "active"
+							}
+						],
+						"data": {
+							"from": "wharfkit1111",
+							"to": "eosio",
+							"quantity": "0.0001 EOS",
+							"memo": "Resource provider test transaction"
+						},
+						"hex_data": "104208d9c1754de30000000000ea3055010000000000000004454f5300000000225265736f757263652070726f76696465722074657374207472616e73616374696f6e"
+					},
+					"context_free": false,
+					"elapsed": 16,
+					"console": "",
+					"trx_id": "4f0ea2f78466b5b95da6efae58e94a950589963695be97545ac72706d75319da",
+					"block_num": 251672678,
+					"block_time": "2026-02-21T17:20:50.500",
+					"producer_block_id": null,
+					"account_ram_deltas": [],
+					"except": null,
+					"error_code": null,
+					"return_value_hex_data": ""
+				}
+			],
+			"account_ram_delta": null,
+			"except": null,
+			"error_code": null
+		}
+	}
+}

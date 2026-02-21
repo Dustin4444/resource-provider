@@ -8,8 +8,7 @@ import { PROVIDER_ACCOUNT_NAME, PROVIDER_ACCOUNT_PERMISSION } from 'src/config';
 const mockRequest =
 	'esr://gmNgZGBY1mTC_MoglIGBIVzX5uxZRqAQGDBBaWeYABgAVcL4LK7-wSBaKSi1OL-0KDlVoaAovywzJbVIoSS1uEShpCgxrzgxuSQzPw-oBQA';
 
-const mockRequestUsingCosigner =
-	'esr://gmNgZGBY1mTC_MoglIGBIVzX5uxZxgkbT908WOr7GCjAsOKtkZEzsgADUCUjAwSwuPoHg2iloNTi_NKi5FSFgqL8ssyU1CKFktTiEoWSosS84sTkksz8PKAWAA';
+const mockRequestUsingCosigner = 'esr://AgABAACmgjQD6jBVAAAAVy08zc0BEDLOVyW36a0AAAAAqO0yMgABAAA';
 
 const mockSigner = {
 	actor: 'wharfkit1111',

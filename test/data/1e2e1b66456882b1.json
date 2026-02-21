@@ -1,0 +1,31 @@
+{
+	"request": {
+		"url": "https://jungle4.greymass.com/v1/chain/get_raw_abi",
+		"body": {
+			"account_name": "greymassnoop"
+		}
+	},
+	"status": 200,
+	"headers": {
+		"access-control-allow-headers": "X-Requested-With,Accept,Content-Type,Origin",
+		"access-control-allow-methods": "GET, POST, OPTIONS",
+		"access-control-allow-origin": "*",
+		"cf-cache-status": "DYNAMIC",
+		"cf-ray": "9d17eaa68ab703c2-SJC",
+		"connection": "keep-alive",
+		"content-encoding": "br",
+		"content-type": "application/json",
+		"date": "Sat, 21 Feb 2026 17:20:49 GMT",
+		"host": "jungle4.greymass.com",
+		"nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+		"report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=tvPRIW9CLEVSISMKBMMzQ6Lo%2BqnTIEFo%2B%2FChMMxp2XPgx20p8DZACwCYMHo24ifee3AUE1mEBZFV80jvo%2ByIwVj3VbUZgozAK5YInmtQdr1TdY4%3D\"}]}",
+		"server": "cloudflare",
+		"transfer-encoding": "chunked"
+	},
+	"body": {
+		"account_name": "greymassnoop",
+		"code_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+		"abi_hash": "1245e8954bce991492621cd66ffe556ef2c2925ee03071a3fba996c83040f867",
+		"abi": "DmVvc2lvOjphYmkvMS4xAAEEbm9vcAAAAQAAAAAAUCmdBG5vb3AZVGhpcyBhY3Rpb24gZG9lcyBub3RoaW5nLgAAAAAA"
+	}
+}

@@ -3,6 +3,8 @@ import { Cron, type CronOptions } from 'croner';
 import { getManagerContext } from './context';
 import { manageAccountResources } from './manage/account';
 
+import { managed } from '$api/v2/manager';
+import { getApp, startApp } from '$lib/http';
 import { managerLog } from '$lib/logger';
 import { objectify } from '$lib/utils';
 import { getManagerSession } from '$lib/wharf/session/manager';
@@ -31,6 +33,14 @@ export async function manager() {
 		);
 		return;
 	}
+
+	const app = getApp();
+	app.group('/v2', (root) =>
+		root.group('/resource', (resource) => resource.group('/manager', (g) => g.use(managed)))
+	);
+
+	startApp();
+	managerLog.info('Resource Manager API routes loaded');
 
 	managerLog.info('Resource Manager Service starting', { cron, cronOptions });
 	managerJob();

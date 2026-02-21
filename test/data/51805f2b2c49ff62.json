@@ -1,0 +1,46 @@
+{
+	"request": {
+		"url": "https://jungle4.greymass.com/v1/chain/get_info",
+		"body": null
+	},
+	"status": 200,
+	"headers": {
+		"access-control-allow-headers": "X-Requested-With,Accept,Content-Type,Origin",
+		"access-control-allow-methods": "GET, POST, OPTIONS",
+		"access-control-allow-origin": "*",
+		"cf-cache-status": "DYNAMIC",
+		"cf-ray": "9d17eaa5d93d03c2-SJC",
+		"connection": "keep-alive",
+		"content-encoding": "br",
+		"content-type": "application/json",
+		"date": "Sat, 21 Feb 2026 17:20:49 GMT",
+		"host": "jungle4.greymass.com",
+		"nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+		"report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=d6KEKz8q5zqY%2FDQNtosumd05hCBXwUIx433hP0cnZsYNwdpBtGHrHL1EYMgWknK03DbQPvnli92lud2jX7bLCi27hXEpK3MyJ%2FrRgi%2FTK2WpsX4%3D\"}]}",
+		"server": "cloudflare",
+		"transfer-encoding": "chunked",
+		"x-cached": "EXPIRED"
+	},
+	"body": {
+		"server_version": "13356212",
+		"chain_id": "73e4385a2708e6d7048834fbc1079f2fabb17b3c125b146af438971e90716c4d",
+		"head_block_num": 251672676,
+		"last_irreversible_block_num": 251672674,
+		"last_irreversible_block_id": "0f0038621403784516ead8e4f6a5bd49afadd977e276981ccca79ace6aa5b792",
+		"head_block_id": "0f0038649dfbcc51f6a57b136c492857fbb39cda83eaea55a90f5648ada28272",
+		"head_block_time": "2026-02-21T17:20:49.500",
+		"head_block_producer": "gorillapower",
+		"virtual_block_cpu_limit": 200000000,
+		"virtual_block_net_limit": 1048576000,
+		"block_cpu_limit": 200000,
+		"block_net_limit": 1048576,
+		"server_version_string": "v1.1.5",
+		"fork_db_head_block_num": 251672676,
+		"fork_db_head_block_id": "0f0038649dfbcc51f6a57b136c492857fbb39cda83eaea55a90f5648ada28272",
+		"server_full_version_string": "v1.1.5-13356212245054c35b1e1e7e20a9bd43ced48c4d",
+		"total_cpu_weight": "120571921960499",
+		"total_net_weight": "117540131717123",
+		"earliest_available_block_num": 251499719,
+		"last_irreversible_block_time": "2026-02-21T17:20:48.500"
+	}
+}

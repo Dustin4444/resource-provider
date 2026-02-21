@@ -27,12 +27,12 @@ run/manager: deps
 	bun run src/index.ts run manager
 
 .PHONY: test
-test: deps clean/testdb 
-	bun --env-file=./test/.env test
+test: deps clean/testdb
+	bun --env-file=./test/.env.test test
 
 .PHONY: test/watch
-test/watch: deps 
-	bun --env-file=./test/.env test --watch
+test/watch: deps
+	bun --env-file=./test/.env.test test --watch
 
 .PHONY: check
 check: deps
@@ -104,4 +104,4 @@ clean/node_modules:
 
 .PHONY: clean/testdb
 clean/testdb:
-	rm src/lib/testing.sqlite
+	rm -f src/lib/testing.sqlite

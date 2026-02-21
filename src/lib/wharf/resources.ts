@@ -19,7 +19,7 @@ export function getResourcesClient() {
 
 export async function getSampledUsage() {
 	const usage = await getResourcesClient().getSampledUsage();
-	generalLog.debug('Sampled Usage', objectify(usage));
+	generalLog.silly('Sampled Usage', objectify(usage));
 	return usage;
 }
 
