@@ -7,14 +7,13 @@ import { providerLog } from '$lib/logger';
 import { makeLinkAuthAction, makeUpdateAuthAction } from '$lib/manager/setup';
 import { objectify } from '$lib/utils';
 import { getClient } from '$lib/wharf/client';
-import { getProviderSession } from '$lib/wharf/session/provider';
+import { getProviderSession } from '$lib/wharf/session';
 import {
 	ANTELOPE_CHAIN_ID,
 	ANTELOPE_NODEOS_API,
 	ANTELOPE_NOOP_CONTRACT,
 	explorers,
-	PROVIDER_ACCOUNT_NAME,
-	PROVIDER_ACCOUNT_PRIVATEKEY
+	PROVIDER_ACCOUNT_NAME
 } from 'src/config';
 
 interface ProviderAccountStatus {
@@ -69,13 +68,7 @@ export async function runProviderSetup(): Promise<boolean> {
 		);
 		return false;
 	}
-	if (!PROVIDER_ACCOUNT_PRIVATEKEY) {
-		providerLog.error(
-			'PROVIDER_ACCOUNT_PRIVATEKEY is not set. Please set this environment variable to the private key for the provider account.'
-		);
-		return false;
-	}
-	const provider = getProviderSession();
+	const provider = await getProviderSession();
 	const data = await getClient().v1.chain.get_account(provider.actor);
 	const status = getProviderAccountStatus(provider, data);
 

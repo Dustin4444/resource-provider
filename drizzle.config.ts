@@ -1,18 +1,12 @@
-import { Config, defineConfig } from 'drizzle-kit';
+import { defineConfig } from 'drizzle-kit';
 
-import { DATABASE_ADAPTER, DATABASE_FILE } from 'src/config';
+import { DATABASE_FILE } from 'src/config';
 
-if (!DATABASE_ADAPTER) {
-	throw new Error('DATABASE_ADAPTER environment variable is not set');
-}
-
-const config = {
+export default defineConfig({
 	schema: './src/lib/db/schema.ts',
 	out: './drizzle',
-	dialect: DATABASE_ADAPTER as Config['dialect'],
+	dialect: 'sqlite',
 	dbCredentials: {
 		url: DATABASE_FILE
 	}
-};
-
-export default defineConfig(config);
+});

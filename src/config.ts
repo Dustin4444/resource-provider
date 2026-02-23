@@ -24,7 +24,7 @@ export const ANTELOPE_TOKEN_CONTRACT = process.env.ANTELOPE_TOKEN_CONTRACT ?? 'c
 // Feature: Automated Resource Management
 export const ENABLE_RESOURCE_MANAGER = isENVTrue(process.env.ENABLE_RESOURCE_MANAGER ?? 'false');
 export const MANAGER_ACCOUNT_NAME = process.env.MANAGER_ACCOUNT_NAME;
-export const MANAGER_ACCOUNT_PERMISSION = process.env.MANAGER_ACCOUNT_PERMISSION ?? 'manager';
+export const MANAGER_ACCOUNT_PERMISSION = process.env.MANAGER_ACCOUNT_PERMISSION;
 export const MANAGER_ACCOUNT_PRIVATEKEY = process.env.MANAGER_ACCOUNT_PRIVATEKEY;
 export const MANAGER_CRONJOB = process.env.MANAGER_CRONJOB ?? '0/10 * * * * *'; // Cron job pattern: https://croner.56k.guru/usage/pattern/
 export const MANAGER_BUYRAM_ENABLED = isENVTrue(process.env.MANAGER_BUYRAM_ENABLED ?? 'true');
@@ -48,18 +48,13 @@ if (ENABLE_RESOURCE_MANAGER) {
 // Feature: Resource Provider APIs
 export const ENABLE_RESOURCE_PROVIDER = isENVTrue(process.env.ENABLE_RESOURCE_PROVIDER ?? 'false');
 export const PROVIDER_ACCOUNT_NAME = process.env.PROVIDER_ACCOUNT_NAME;
-export const PROVIDER_ACCOUNT_PERMISSION = process.env.PROVIDER_ACCOUNT_PERMISSION ?? 'provider';
+export const PROVIDER_ACCOUNT_PERMISSION = process.env.PROVIDER_ACCOUNT_PERMISSION;
 export const PROVIDER_ACCOUNT_PRIVATEKEY = process.env.PROVIDER_ACCOUNT_PRIVATEKEY;
 
 if (ENABLE_RESOURCE_PROVIDER) {
 	if (!PROVIDER_ACCOUNT_NAME) {
 		throw new Error(
 			'If ENABLE_RESOURCE_PROVIDER is set to true, PROVIDER_ACCOUNT_NAME must also be defined.'
-		);
-	}
-	if (!PROVIDER_ACCOUNT_PRIVATEKEY) {
-		throw new Error(
-			'If ENABLE_RESOURCE_PROVIDER is set to true, PROVIDER_ACCOUNT_PRIVATEKEY must also be defined.'
 		);
 	}
 }

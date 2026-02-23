@@ -7,7 +7,7 @@ import { managed } from '$api/v2/manager';
 import { getApp, startApp } from '$lib/http';
 import { managerLog } from '$lib/logger';
 import { objectify } from '$lib/utils';
-import { getManagerSession } from '$lib/wharf/session/manager';
+import { getManagerSession } from '$lib/wharf/session';
 import { ENABLE_RESOURCE_MANAGER, MANAGER_CRONJOB } from 'src/config';
 
 const cron = MANAGER_CRONJOB;

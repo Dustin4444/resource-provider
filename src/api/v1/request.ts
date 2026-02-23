@@ -15,14 +15,12 @@ import { addBuyRAMBytesAction } from '$lib/wharf/actions/ram';
 import { getClient } from '$lib/wharf/client';
 import { invalidateContractCache } from '$lib/wharf/contracts';
 import { getResourcesClient } from '$lib/wharf/resources';
-import { signTransaction } from '$lib/wharf/session/provider';
+import { getProviderSession, signTransaction } from '$lib/wharf/session';
 import { createSigningRequest } from '$lib/wharf/signing-request';
 import {
 	ANTELOPE_SYSTEM_TOKEN,
 	ENABLE_FREE_TRANSACTIONS,
 	ENABLE_PAID_TRANSACTIONS,
-	PROVIDER_ACCOUNT_NAME,
-	PROVIDER_ACCOUNT_PERMISSION,
 	PROVIDER_FREE_TRANSACTIONS_LIMIT_KB,
 	PROVIDER_FREE_TRANSACTIONS_LIMIT_MS,
 	PROVIDER_MIN_CPU_US,
@@ -281,7 +279,7 @@ async function processRequest(
 	const withinQuota = await checkQuota(String(requester.actor), resourceNeeds);
 
 	if (withinQuota) {
-		const providerSignature = signTransaction(transaction);
+		const providerSignature = await signTransaction(transaction);
 		await usageDatabase.incrementUsage(
 			String(requester.actor),
 			resourceNeeds.cpu,
@@ -317,7 +315,7 @@ async function processRequest(
 		'Resource Provider Fee'
 	);
 
-	const providerSignature = signTransaction(transaction);
+	const providerSignature = await signTransaction(transaction);
 
 	return {
 		code: 402,
@@ -342,10 +340,8 @@ export async function request({
 }): Promise<v1ResponseTypes> {
 	const signingRequest = await createSigningRequest(body);
 	const requester = resolvePermissionLevel(body.signer);
-	const cosigner = PermissionLevel.from({
-		actor: PROVIDER_ACCOUNT_NAME,
-		permission: PROVIDER_ACCOUNT_PERMISSION
-	});
+	const session = await getProviderSession();
+	const cosigner = session.permissionLevel;
 
 	validateRequest(cosigner, signingRequest);
 	validateRequester(cosigner, requester);

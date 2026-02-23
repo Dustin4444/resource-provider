@@ -15,6 +15,12 @@ export const manager = sqliteTable('manager', {
 	key: text('key').notNull()
 });
 
+export const provider = sqliteTable('provider', {
+	account: text('account').primaryKey(),
+	permission: text('permission').notNull(),
+	key: text('key').notNull()
+});
+
 export const usage = sqliteTable('usage', {
 	account: text('account').primaryKey(),
 	cpu: integer('cpu').notNull().default(0),

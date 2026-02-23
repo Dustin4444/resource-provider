@@ -5,7 +5,7 @@ import { managerLog } from '$lib/logger';
 import { makeDeleteAuthAction, makeUnlinkAuthAction } from '$lib/manager/setup';
 import { objectify } from '$lib/utils';
 import { getClient } from '$lib/wharf/client';
-import { getManagerSession } from '$lib/wharf/session/manager';
+import { getManagerSession } from '$lib/wharf/session';
 import {
 	ANTELOPE_CHAIN_ID,
 	ANTELOPE_SYSTEM_CONTRACT,

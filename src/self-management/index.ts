@@ -4,7 +4,7 @@ import { Cron, type CronOptions } from 'croner';
 import { generalLog } from '$lib/logger';
 import { manageSelfResources, type SelfManagementConfig } from '$lib/self-management';
 import { getClient } from '$lib/wharf/client';
-import { getManagerSession } from '$lib/wharf/session/manager';
+import { getManagerSession } from '$lib/wharf/session';
 import {
 	ENABLE_SELF_MANAGEMENT,
 	MANAGER_ACCOUNT_NAME,
