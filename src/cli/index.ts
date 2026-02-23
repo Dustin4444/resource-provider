@@ -10,13 +10,12 @@ import { makeManagerAddCommand } from './manager/add';
 import { makeManagerListCommand } from './manager/list';
 import { makeManagerRemoveCommand } from './manager/remove';
 import { makeManagerRunCommand } from './manager/run';
-import { makeManagerSetupCommand, runManagerSetup } from './manager/setup';
+import { makeManagerSetupCommand } from './manager/setup';
 import { makeManagerUnauthorizeCommand } from './manager/unauthorize';
-import { makeProviderSetupCommand, runProviderSetup } from './provider/setup';
+import { makeProviderSetupCommand } from './provider/setup';
 
 import { usageDatabase } from '$lib/db/models/provider/usage';
 import { createEnvironmentalFile } from '$lib/env';
-import { MANAGER_ACCOUNT_NAME, PROVIDER_ACCOUNT_NAME } from 'src/config';
 
 const services = ['all', 'api', 'manager'];
 
@@ -33,24 +32,6 @@ export function prompt() {
 		.action(async () => {
 			await createEnvironmentalFile();
 			generalLog.info('Created a new blank configuration file (.env)');
-		});
-
-	program
-		.command('setup')
-		.description('Configure account permissions for all enabled services')
-		.action(async () => {
-			if (!PROVIDER_ACCOUNT_NAME && !MANAGER_ACCOUNT_NAME) {
-				console.log(
-					'No accounts configured. Set PROVIDER_ACCOUNT_NAME and/or MANAGER_ACCOUNT_NAME in your configuration.'
-				);
-				return;
-			}
-			if (PROVIDER_ACCOUNT_NAME) {
-				await runProviderSetup();
-			}
-			if (MANAGER_ACCOUNT_NAME) {
-				await runManagerSetup();
-			}
 		});
 
 	program.commandsGroup('Run Service');
