@@ -33,6 +33,7 @@ export const v1PowerupResponseRejected = t.Object(v2GenericResponse.properties, 
 export const v1PowerupRequest = {
 	body: v1PowerupRequestBody,
 	detail: {
+		summary: 'Request PowerUp',
 		tags: ['Resource Provider (v1)']
 	},
 	response: {
@@ -44,6 +45,7 @@ export const v1PowerupRequest = {
 export const v1ProviderRequestBody = t.Object(
 	{
 		signer: TSigner,
+		ref: t.Optional(t.String()),
 		request: t.Optional(t.String()),
 		transaction: t.Optional(TTransaction),
 		packedTransaction: t.Optional(TPackedTransaction)
@@ -122,6 +124,7 @@ export type v1PowerupResponse = Static<
 export const v1ProviderRequest = {
 	body: v1ProviderRequestBody,
 	detail: {
+		summary: 'Cosign Transaction',
 		tags: ['Resource Provider (v1)']
 	},
 	response: {
@@ -130,3 +133,4 @@ export const v1ProviderRequest = {
 		402: v1ResponseRequiresPayment
 	}
 };
+

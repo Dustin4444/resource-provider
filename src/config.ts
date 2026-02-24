@@ -132,9 +132,17 @@ export const PROVIDER_MIN_NET_BYTES = process.env.PROVIDER_MIN_NET_BYTES
 	: 50000;
 
 // Feature: Resource Provider API - Cosign transactions to fee-based resources
-export const ENABLE_PAID_TRANSACTIONS = isENVTrue(process.env.ENABLE_PAID_TRANSACTIONS ?? 'false');
-export const PROVIDER_PAID_TRANSACTIONS_MINIMUM_FEE =
-	process.env.PROVIDER_PAID_TRANSACTIONS_MINIMUM_FEE;
+export const ENABLE_PAID_TRANSACTIONS = isENVTrue(process.env.ENABLE_PAID_TRANSACTIONS ?? 'true');
+export const PROVIDER_PAID_TRANSACTIONS_MINIMUM_FEE = (() => {
+	const val = process.env.PROVIDER_PAID_TRANSACTIONS_MINIMUM_FEE;
+	const symbol = ANTELOPE_SYSTEM_TOKEN.split(',')[1];
+	if (!val) return `0.0001 ${symbol}`;
+	if (/^\d/.test(val) && !val.includes(' ')) return `${val} ${symbol}`;
+	return val;
+})();
+export const PROVIDER_PAID_TRANSACTIONS_FEE_RECIPIENT = process.env.PROVIDER_PAID_TRANSACTIONS_FEE_RECIPIENT;
+export const PROVIDER_PAID_TRANSACTIONS_FEE_MEMO = process.env.PROVIDER_PAID_TRANSACTIONS_FEE_MEMO ?? 'Fuel Transaction Fee';
+export const PROVIDER_PAID_TRANSACTIONS_FEE_DEFAULT_REF = process.env.PROVIDER_PAID_TRANSACTIONS_FEE_DEFAULT_REF ?? 'teamgreymass';
 
 if (ENABLE_PAID_TRANSACTIONS) {
 	if (!ENABLE_RESOURCE_PROVIDER) {
@@ -142,11 +150,12 @@ if (ENABLE_PAID_TRANSACTIONS) {
 			'If ENABLE_PAID_TRANSACTIONS is set to true, ENABLE_RESOURCE_PROVIDER must also be set to true.'
 		);
 	}
-	if (!PROVIDER_PAID_TRANSACTIONS_MINIMUM_FEE) {
-		throw new Error(
-			'If ENABLE_PAID_TRANSACTIONS is set to true, PROVIDER_PAID_TRANSACTIONS_MINIMUM_FEE must also be defined.'
-		);
-	}
+}
+
+if (ENABLE_RESOURCE_PROVIDER && !ENABLE_FREE_TRANSACTIONS && !ENABLE_PAID_TRANSACTIONS) {
+	throw new Error(
+		'ENABLE_RESOURCE_PROVIDER requires at least one of ENABLE_FREE_TRANSACTIONS or ENABLE_PAID_TRANSACTIONS to be enabled.'
+	);
 }
 
 // Feature: Self-Management (auto-PowerUp for the service's own account)

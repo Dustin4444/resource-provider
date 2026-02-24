@@ -8,7 +8,6 @@ import { generalLog } from '$lib/logger';
 runMigrations();
 
 if (ENVIRONMENT === 'testing') {
-	// Automatically start the server in testing environment
 	generalLog.debug('Starting server in testing environment...');
 	server();
 } else {

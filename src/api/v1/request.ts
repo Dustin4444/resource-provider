@@ -25,6 +25,9 @@ import {
 	PROVIDER_FREE_TRANSACTIONS_LIMIT_MS,
 	PROVIDER_MIN_CPU_US,
 	PROVIDER_MIN_NET_BYTES,
+	PROVIDER_PAID_TRANSACTIONS_FEE_DEFAULT_REF,
+	PROVIDER_PAID_TRANSACTIONS_FEE_MEMO,
+	PROVIDER_PAID_TRANSACTIONS_FEE_RECIPIENT,
 	PROVIDER_PAID_TRANSACTIONS_MINIMUM_FEE,
 	PROVIDER_REQUIRE_RESOURCE_NEED
 } from 'src/config';
@@ -120,7 +123,19 @@ function determineResourceNeeds(samples: API.v1.SendTransactionResponse[]): Reso
 				break;
 			}
 			default: {
-				throw new Error(`${exception.name}: ${exception.message}`);
+				const frame = exception.stack?.[0];
+				let detail = frame?.format ?? exception.message;
+				if (frame?.data) {
+					for (const [key, value] of Object.entries(frame.data)) {
+						detail = detail.replace(`\${${key}}`, String(value));
+					}
+				}
+				providerLog.debug('compute_transaction exception', {
+					name: exception.name,
+					message: exception.message,
+					stack: exception.stack
+				});
+				throw new Error(`${exception.name}: ${detail}`);
 			}
 		}
 	}
@@ -214,15 +229,27 @@ async function calculateCosts(resourceNeeds: ResourceNeeds): Promise<ResourceCos
 	const cpuMs = resourceNeeds.cpu / 1000;
 	const netKb = resourceNeeds.net / 1000;
 
-	const cpuCost =
-		cpuMs > 0
-			? Asset.fromFloat(powerup.cpu.price_per_ms(sample, cpuMs), ANTELOPE_SYSTEM_TOKEN)
-			: Asset.from(0, ANTELOPE_SYSTEM_TOKEN);
+	const zeroCost = () => Asset.from(0, ANTELOPE_SYSTEM_TOKEN);
 
-	const netCost =
-		netKb > 0
-			? Asset.fromFloat(powerup.net.price_per_kb(sample, netKb), ANTELOPE_SYSTEM_TOKEN)
-			: Asset.from(0, ANTELOPE_SYSTEM_TOKEN);
+	let cpuCost: Asset;
+	try {
+		cpuCost =
+			cpuMs > 0
+				? Asset.fromFloat(powerup.cpu.price_per_ms(sample, cpuMs), ANTELOPE_SYSTEM_TOKEN)
+				: zeroCost();
+	} catch {
+		cpuCost = zeroCost();
+	}
+
+	let netCost: Asset;
+	try {
+		netCost =
+			netKb > 0
+				? Asset.fromFloat(powerup.net.price_per_kb(sample, netKb), ANTELOPE_SYSTEM_TOKEN)
+				: zeroCost();
+	} catch {
+		netCost = zeroCost();
+	}
 
 	let ramCost = Asset.from(0, ANTELOPE_SYSTEM_TOKEN);
 	if (resourceNeeds.ram > 0) {
@@ -254,7 +281,8 @@ function calculateTotalFee(costs: ResourceCosts): Asset {
 async function processRequest(
 	request: SigningRequest,
 	requester: PermissionLevel,
-	cosigner: PermissionLevel
+	cosigner: PermissionLevel,
+	ref?: string
 ): Promise<v1ResponseTypes> {
 	let accountData: API.v1.AccountObject;
 	try {
@@ -262,11 +290,16 @@ async function processRequest(
 	} catch {
 		throw new Error(`Unable to retrieve account data for ${requester.actor}.`);
 	}
+	providerLog.debug('Account data retrieved', { account: String(requester.actor) });
+
 	checkResourceSufficiency(accountData);
+	providerLog.debug('Resource sufficiency check passed');
 
 	let transaction = await resolveTransaction(request, requester);
+	providerLog.debug('Transaction resolved', { actions: transaction.actions.length });
 
 	transaction = await addNoopAction(transaction, cosigner);
+	providerLog.debug('Noop action added');
 
 	const resourceNeeds = await computeResourceNeeds(transaction);
 	providerLog.debug('Resource needs computed', resourceNeeds);
@@ -279,6 +312,7 @@ async function processRequest(
 	const withinQuota = await checkQuota(String(requester.actor), resourceNeeds);
 
 	if (withinQuota) {
+		providerLog.debug('Within free quota, signing transaction');
 		const providerSignature = await signTransaction(transaction);
 		await usageDatabase.incrementUsage(
 			String(requester.actor),
@@ -286,6 +320,7 @@ async function processRequest(
 			resourceNeeds.net
 		);
 
+		providerLog.info('Provided resources (free)', { account: String(requester.actor), cpu: resourceNeeds.cpu, net: resourceNeeds.net });
 		return {
 			code: 200,
 			data: {
@@ -304,19 +339,28 @@ async function processRequest(
 		);
 	}
 
+	providerLog.debug('Exceeds free quota, calculating paid costs');
 	const costs = await calculateCosts(resourceNeeds);
 	const totalFee = calculateTotalFee(costs);
+	const providerFee = calculateTotalFee({ cpu: costs.cpu, net: costs.net, ram: Asset.from(0, ANTELOPE_SYSTEM_TOKEN) });
+	providerLog.debug('Fee calculated', { fee: String(totalFee), providerFee: String(providerFee) });
+
+	const feeRef = ref || PROVIDER_PAID_TRANSACTIONS_FEE_DEFAULT_REF;
+	const feeMemo = feeRef
+		? `${PROVIDER_PAID_TRANSACTIONS_FEE_MEMO} | ref=${feeRef}`
+		: PROVIDER_PAID_TRANSACTIONS_FEE_MEMO;
 
 	transaction = await addFeeAction(
 		transaction,
 		requester,
-		cosigner,
-		totalFee,
-		'Resource Provider Fee'
+		PROVIDER_PAID_TRANSACTIONS_FEE_RECIPIENT || cosigner.actor,
+		providerFee,
+		feeMemo
 	);
 
 	const providerSignature = await signTransaction(transaction);
 
+	providerLog.info('Provided resources (paid)', { account: String(requester.actor), cpu: resourceNeeds.cpu, net: resourceNeeds.net, fee: String(providerFee) });
 	return {
 		code: 402,
 		data: {
@@ -343,19 +387,27 @@ export async function request({
 	const session = await getProviderSession();
 	const cosigner = session.permissionLevel;
 
+	providerLog.debug('Processing request', {
+		requester: String(requester),
+		cosigner: String(cosigner)
+	});
+
 	validateRequest(cosigner, signingRequest);
 	validateRequester(cosigner, requester);
 
 	try {
-		return await processRequest(signingRequest, requester, cosigner);
+		return await processRequest(signingRequest, requester, cosigner, body.ref);
 	} catch (error) {
 		const staleContract = getStaleContract(error);
-		if (!staleContract) throw error;
+		if (!staleContract) {
+			providerLog.error('Request failed', { error: String(error) });
+			throw error;
+		}
 		providerLog.warn('Stale ABI detected, retrying with fresh contract', {
 			error: String(error),
 			contract: staleContract
 		});
 		invalidateContractCache(staleContract);
-		return processRequest(signingRequest, requester, cosigner);
+		return processRequest(signingRequest, requester, cosigner, body.ref);
 	}
 }

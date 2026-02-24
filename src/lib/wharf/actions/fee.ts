@@ -1,5 +1,5 @@
 import { Transaction } from '@wharfkit/antelope';
-import type { Asset, PermissionLevel } from '@wharfkit/antelope';
+import type { Asset, NameType, PermissionLevel } from '@wharfkit/antelope';
 
 import { getContract } from '../contracts';
 
@@ -8,9 +8,9 @@ import { ANTELOPE_TOKEN_CONTRACT } from 'src/config';
 export async function addFeeAction(
 	transaction: Transaction,
 	requester: PermissionLevel,
-	recipient: PermissionLevel,
+	recipient: NameType,
 	fee: Asset,
-	memo: string = 'Resource Provider Fee'
+	memo: string
 ): Promise<Transaction> {
 	const tokenContract = await getContract(ANTELOPE_TOKEN_CONTRACT);
 	const modified = Transaction.from(transaction);
@@ -18,7 +18,7 @@ export async function addFeeAction(
 		'transfer',
 		{
 			from: requester.actor,
-			to: recipient.actor,
+			to: recipient,
 			quantity: fee,
 			memo
 		},

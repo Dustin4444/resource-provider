@@ -1,8 +1,9 @@
 import { Elysia } from 'elysia';
 import type { Static } from 'elysia';
 
-import { v2ProviderRequest, v2ProviderRequestPacked, v2ProviderRequestTransaction } from './types';
+import { v2ProviderRequest, v2ProviderRequestPacked, v2ProviderRequestTransaction, v2ProviderUsage } from './types';
 import type { v2ProviderRequestBody, v2ProviderResponseSuccess } from './types';
+import { usage } from './usage';
 
 export async function processResourceRequest({
 	body
@@ -12,9 +13,11 @@ export async function processResourceRequest({
 	throw new Error('Not implemented' + body.signer);
 }
 
-export const provider = new Elysia().group('/request', (root) =>
-	root
-		.post('/', processResourceRequest, v2ProviderRequest)
-		.post('/packed', processResourceRequest, v2ProviderRequestPacked)
-		.post('/transaction', processResourceRequest, v2ProviderRequestTransaction)
-);
+export const provider = new Elysia()
+	.get('/usage/:account', usage, v2ProviderUsage)
+	.group('/request', (root) =>
+		root
+			.post('/', processResourceRequest, v2ProviderRequest)
+			.post('/packed', processResourceRequest, v2ProviderRequestPacked)
+			.post('/transaction', processResourceRequest, v2ProviderRequestTransaction)
+	);

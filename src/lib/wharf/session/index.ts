@@ -26,23 +26,26 @@ function createSession(account: ServiceAccountData): Session {
 	});
 }
 
-let providerSession: Session | null = null;
-let managerSession: Session | null = null;
+let providerSessionPromise: Promise<Session> | null = null;
+let managerSessionPromise: Promise<Session> | null = null;
 
-export async function getProviderSession(): Promise<Session> {
-	if (!providerSession) {
-		validateChainConfig();
-		providerSession = createSession(await providerAccount.getAccount());
-	}
-	return providerSession;
+async function initSession(getAccount: () => Promise<ServiceAccountData>): Promise<Session> {
+	validateChainConfig();
+	return createSession(await getAccount());
 }
 
-export async function getManagerSession(): Promise<Session> {
-	if (!managerSession) {
-		validateChainConfig();
-		managerSession = createSession(await managerAccount.getAccount());
+export function getProviderSession(): Promise<Session> {
+	if (!providerSessionPromise) {
+		providerSessionPromise = initSession(() => providerAccount.getAccount());
 	}
-	return managerSession;
+	return providerSessionPromise;
+}
+
+export function getManagerSession(): Promise<Session> {
+	if (!managerSessionPromise) {
+		managerSessionPromise = initSession(() => managerAccount.getAccount());
+	}
+	return managerSessionPromise;
 }
 
 export async function signTransaction(transaction: Transaction): Promise<Signature> {

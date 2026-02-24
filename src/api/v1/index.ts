@@ -9,7 +9,14 @@ import {
 } from './types';
 import type { v1ResponseRejected } from './types';
 
+import { providerLog } from '$lib/logger';
+
 export const v1 = new Elysia()
+	.onParse({ as: 'scoped' }, async ({ request, contentType }) => {
+		if (contentType === 'text/plain') {
+			return request.json();
+		}
+	})
 	.group('/v1', (root) =>
 		root.group('/resource_provider', (group) =>
 			group
@@ -26,6 +33,7 @@ export const v1 = new Elysia()
 					error: context.error.all
 				};
 			default:
+				providerLog.error('Request failed', { error: String(context.error) });
 				return {
 					code: 400,
 					message: String(context.error)

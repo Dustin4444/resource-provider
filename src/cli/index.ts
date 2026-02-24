@@ -4,6 +4,7 @@ import { version } from '../../package.json';
 import { generalLog } from '../lib/logger';
 import { manager } from '../manager';
 import { server } from '../provider';
+import { validateProviderAccount } from '../provider/validate';
 import { selfManagement } from '../self-management';
 
 import { makeManagerAddCommand } from './manager/add';
@@ -41,8 +42,12 @@ export function prompt() {
 			new Argument('[service]', 'The service name to start').default('all').choices(services)
 		)
 		.description('Run one or more resource provider services (e.g. all, api, manager)')
-		.action((service) => {
+		.action(async (service) => {
 			if (service === 'all' || service === 'api') {
+				const valid = await validateProviderAccount();
+				if (!valid) {
+					return;
+				}
 				server();
 			}
 			if (service === 'all' || service === 'manager') {

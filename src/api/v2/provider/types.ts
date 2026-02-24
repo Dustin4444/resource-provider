@@ -101,6 +101,7 @@ export const v2ProviderResponseRequiresPayment = t.Object(
 export const v2ProviderRequest = {
 	body: v2ProviderRequestBody,
 	detail: {
+		summary: 'Cosign Request',
 		tags
 	},
 	response: {
@@ -113,6 +114,7 @@ export const v2ProviderRequest = {
 export const v2ProviderRequestPacked = {
 	body: v2ProviderPackedTransactionBody,
 	detail: {
+		summary: 'Cosign Packed Transaction',
 		tags
 	},
 	response: {
@@ -125,11 +127,38 @@ export const v2ProviderRequestPacked = {
 export const v2ProviderRequestTransaction = {
 	body: v2ProviderTransactionBody,
 	detail: {
+		summary: 'Cosign Transaction',
 		tags
 	},
 	response: {
 		200: v2ProviderResponseSuccess,
 		400: v2ProviderResponseRejected,
 		402: v2ProviderResponseRequiresPayment
+	}
+};
+
+export const v2ProviderUsageResponse = t.Object({
+	account: t.String(),
+	usage: t.Object({
+		cpu: t.Number(),
+		net: t.Number()
+	}),
+	quota: t.Object({
+		cpu: t.Number(),
+		net: t.Number()
+	})
+});
+
+export const v2ProviderUsage = {
+	params: t.Object({
+		account: t.String()
+	}),
+	detail: {
+		summary: 'Account Usage',
+		description: 'View the free resource usage quota for a specific account.',
+		tags
+	},
+	response: {
+		200: v2ProviderUsageResponse
 	}
 };
