@@ -1,6 +1,6 @@
-import { managerLog } from '$lib/logger';
 import { ServiceAccount } from '$lib/db/models/service';
 import * as schema from '$lib/db/schema';
+import { managerLog } from '$lib/logger';
 import {
 	MANAGER_ACCOUNT_NAME,
 	MANAGER_ACCOUNT_PERMISSION,

@@ -1,7 +1,8 @@
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, gt, lt, sql } from 'drizzle-orm';
 
 import { database } from '$lib/db';
 import { AbstractDatabase } from '$lib/db/abstract';
+import { PROVIDER_USAGE_WINDOW_HOURS } from 'src/config';
 
 export interface AccountUsage {
 	account: string;
@@ -10,35 +11,48 @@ export interface AccountUsage {
 }
 
 export class UsageDatabase extends AbstractDatabase {
+	private windowStart(): number {
+		return Math.floor(Date.now() / 1000) - PROVIDER_USAGE_WINDOW_HOURS * 3600;
+	}
+
 	async getUsage(account: string): Promise<AccountUsage> {
-		const result = await database
-			.select()
+		const result = database
+			.select({
+				cpu: sql<number>`coalesce(sum(${this.schema.usage.cpu}), 0)`,
+				net: sql<number>`coalesce(sum(${this.schema.usage.net}), 0)`
+			})
 			.from(this.schema.usage)
-			.where(eq(this.schema.usage.account, account))
-			.limit(1);
+			.where(
+				and(
+					eq(this.schema.usage.account, account),
+					gt(this.schema.usage.created_at, this.windowStart())
+				)
+			)
+			.get();
 
-		if (result.length === 0) {
-			return { account, cpu: 0, net: 0 };
-		}
-
-		return result[0];
+		return {
+			account,
+			cpu: result?.cpu ?? 0,
+			net: result?.net ?? 0
+		};
 	}
 
 	async incrementUsage(account: string, cpu: number, net: number): Promise<void> {
-		await database
+		database
 			.insert(this.schema.usage)
-			.values({ account, cpu, net })
-			.onConflictDoUpdate({
-				target: this.schema.usage.account,
-				set: {
-					cpu: sql`${this.schema.usage.cpu} + ${cpu}`,
-					net: sql`${this.schema.usage.net} + ${net}`
-				}
-			});
+			.values({ account, cpu, net, created_at: Math.floor(Date.now() / 1000) })
+			.run();
+	}
+
+	async cleanupExpired(): Promise<void> {
+		database
+			.delete(this.schema.usage)
+			.where(lt(this.schema.usage.created_at, this.windowStart()))
+			.run();
 	}
 
 	async resetAllUsage(): Promise<void> {
-		await database.delete(this.schema.usage);
+		database.delete(this.schema.usage).run();
 	}
 }
 

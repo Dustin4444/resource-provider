@@ -117,8 +117,11 @@ if (ENABLE_FREE_TRANSACTIONS) {
 	}
 }
 
-// Feature: Resource Provider API - Usage tracking and reset
-export const PROVIDER_USAGE_RESET_CRON = process.env.PROVIDER_USAGE_RESET_CRON ?? '0 0 * * *';
+// Feature: Resource Provider API - Usage tracking
+export const PROVIDER_USAGE_WINDOW_HOURS = process.env.PROVIDER_USAGE_WINDOW_HOURS
+	? Number(process.env.PROVIDER_USAGE_WINDOW_HOURS)
+	: 24;
+export const PROVIDER_USAGE_CLEANUP_CRON = process.env.PROVIDER_USAGE_CLEANUP_CRON ?? '0 * * * *';
 
 // Feature: Resource Provider API - Resource sufficiency check
 export const PROVIDER_REQUIRE_RESOURCE_NEED = isENVTrue(
@@ -140,9 +143,12 @@ export const PROVIDER_PAID_TRANSACTIONS_MINIMUM_FEE = (() => {
 	if (/^\d/.test(val) && !val.includes(' ')) return `${val} ${symbol}`;
 	return val;
 })();
-export const PROVIDER_PAID_TRANSACTIONS_FEE_RECIPIENT = process.env.PROVIDER_PAID_TRANSACTIONS_FEE_RECIPIENT;
-export const PROVIDER_PAID_TRANSACTIONS_FEE_MEMO = process.env.PROVIDER_PAID_TRANSACTIONS_FEE_MEMO ?? 'Fuel Transaction Fee';
-export const PROVIDER_PAID_TRANSACTIONS_FEE_DEFAULT_REF = process.env.PROVIDER_PAID_TRANSACTIONS_FEE_DEFAULT_REF ?? 'teamgreymass';
+export const PROVIDER_PAID_TRANSACTIONS_FEE_RECIPIENT =
+	process.env.PROVIDER_PAID_TRANSACTIONS_FEE_RECIPIENT;
+export const PROVIDER_PAID_TRANSACTIONS_FEE_MEMO =
+	process.env.PROVIDER_PAID_TRANSACTIONS_FEE_MEMO ?? 'Fuel Transaction Fee';
+export const PROVIDER_PAID_TRANSACTIONS_FEE_DEFAULT_REF =
+	process.env.PROVIDER_PAID_TRANSACTIONS_FEE_DEFAULT_REF ?? 'teamgreymass';
 
 if (ENABLE_PAID_TRANSACTIONS) {
 	if (!ENABLE_RESOURCE_PROVIDER) {

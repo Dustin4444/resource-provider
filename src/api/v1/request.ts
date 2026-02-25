@@ -320,7 +320,11 @@ async function processRequest(
 			resourceNeeds.net
 		);
 
-		providerLog.info('Provided resources (free)', { account: String(requester.actor), cpu: resourceNeeds.cpu, net: resourceNeeds.net });
+		providerLog.info('Provided resources (free)', {
+			account: String(requester.actor),
+			cpu: resourceNeeds.cpu,
+			net: resourceNeeds.net
+		});
 		return {
 			code: 200,
 			data: {
@@ -342,7 +346,11 @@ async function processRequest(
 	providerLog.debug('Exceeds free quota, calculating paid costs');
 	const costs = await calculateCosts(resourceNeeds);
 	const totalFee = calculateTotalFee(costs);
-	const providerFee = calculateTotalFee({ cpu: costs.cpu, net: costs.net, ram: Asset.from(0, ANTELOPE_SYSTEM_TOKEN) });
+	const providerFee = calculateTotalFee({
+		cpu: costs.cpu,
+		net: costs.net,
+		ram: Asset.from(0, ANTELOPE_SYSTEM_TOKEN)
+	});
 	providerLog.debug('Fee calculated', { fee: String(totalFee), providerFee: String(providerFee) });
 
 	const feeRef = ref || PROVIDER_PAID_TRANSACTIONS_FEE_DEFAULT_REF;
@@ -360,7 +368,12 @@ async function processRequest(
 
 	const providerSignature = await signTransaction(transaction);
 
-	providerLog.info('Provided resources (paid)', { account: String(requester.actor), cpu: resourceNeeds.cpu, net: resourceNeeds.net, fee: String(providerFee) });
+	providerLog.info('Provided resources (paid)', {
+		account: String(requester.actor),
+		cpu: resourceNeeds.cpu,
+		net: resourceNeeds.net,
+		fee: String(providerFee)
+	});
 	return {
 		code: 402,
 		data: {

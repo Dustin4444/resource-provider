@@ -1,6 +1,6 @@
-import { providerLog } from '$lib/logger';
 import { ServiceAccount } from '$lib/db/models/service';
 import * as schema from '$lib/db/schema';
+import { providerLog } from '$lib/logger';
 import {
 	PROVIDER_ACCOUNT_NAME,
 	PROVIDER_ACCOUNT_PERMISSION,

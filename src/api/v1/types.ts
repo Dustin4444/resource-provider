@@ -133,4 +133,3 @@ export const v1ProviderRequest = {
 		402: v1ResponseRequiresPayment
 	}
 };
-

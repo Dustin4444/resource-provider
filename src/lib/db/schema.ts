@@ -1,4 +1,4 @@
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export const users = sqliteTable('accounts', {
 	account: text('account').primaryKey(),
@@ -21,8 +21,14 @@ export const provider = sqliteTable('provider', {
 	key: text('key').notNull()
 });
 
-export const usage = sqliteTable('usage', {
-	account: text('account').primaryKey(),
-	cpu: integer('cpu').notNull().default(0),
-	net: integer('net').notNull().default(0)
-});
+export const usage = sqliteTable(
+	'usage',
+	{
+		id: integer('id').primaryKey({ autoIncrement: true }),
+		account: text('account').notNull(),
+		cpu: integer('cpu').notNull(),
+		net: integer('net').notNull(),
+		created_at: integer('created_at').notNull()
+	},
+	(table) => [index('idx_usage_account_created').on(table.account, table.created_at)]
+);

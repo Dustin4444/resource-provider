@@ -5,16 +5,16 @@ import { provider } from '$api/v2/provider';
 import { usageDatabase } from '$lib/db/models/provider/usage';
 import { getApp, startApp } from '$lib/http';
 import { providerLog } from '$lib/logger';
-import { ENABLE_RESOURCE_PROVIDER, PROVIDER_USAGE_RESET_CRON } from 'src/config';
+import { ENABLE_RESOURCE_PROVIDER, PROVIDER_USAGE_CLEANUP_CRON } from 'src/config';
 
 const cronOptions: CronOptions = {
-	catch: (e) => providerLog.error('Usage reset cron failed', { error: String(e) }),
+	catch: (e) => providerLog.error('Usage cleanup cron failed', { error: String(e) }),
 	protect: true
 };
 
-async function resetUsage() {
-	providerLog.info('Resetting usage data');
-	await usageDatabase.resetAllUsage();
+async function cleanupUsage() {
+	providerLog.info('Cleaning up expired usage records');
+	await usageDatabase.cleanupExpired();
 }
 
 export function server() {
@@ -25,8 +25,8 @@ export function server() {
 		return;
 	}
 
-	new Cron(PROVIDER_USAGE_RESET_CRON, cronOptions, resetUsage);
-	providerLog.info('Usage reset cron scheduled', { cron: PROVIDER_USAGE_RESET_CRON });
+	new Cron(PROVIDER_USAGE_CLEANUP_CRON, cronOptions, cleanupUsage);
+	providerLog.info('Usage cleanup cron scheduled', { cron: PROVIDER_USAGE_CLEANUP_CRON });
 
 	const app = getApp();
 	app.use(v1);

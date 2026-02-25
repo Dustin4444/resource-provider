@@ -17,6 +17,7 @@ import { makeProviderSetupCommand } from './provider/setup';
 
 import { usageDatabase } from '$lib/db/models/provider/usage';
 import { createEnvironmentalFile } from '$lib/env';
+import { PROVIDER_USAGE_WINDOW_HOURS } from 'src/config';
 
 const services = ['all', 'api', 'manager'];
 
@@ -87,7 +88,7 @@ export function prompt() {
 		.argument('<string>', 'account name to query')
 		.action(async (name) => {
 			const result = await usageDatabase.getUsage(name);
-			generalLog.info(`Usage for ${name}:`, result);
+			generalLog.info(`Usage for ${name} (last ${PROVIDER_USAGE_WINDOW_HOURS}h):`, result);
 		});
 	program.commandsGroup('Database Management');
 	program

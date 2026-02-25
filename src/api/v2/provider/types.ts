@@ -146,6 +146,9 @@ export const v2ProviderUsageResponse = t.Object({
 	quota: t.Object({
 		cpu: t.Number(),
 		net: t.Number()
+	}),
+	window: t.Object({
+		hours: t.Number()
 	})
 });
 
