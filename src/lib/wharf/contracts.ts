@@ -3,6 +3,23 @@ import { Contract, ContractKit } from '@wharfkit/contract';
 
 import { getClient } from '$lib/wharf/client';
 
+const ABI_ERROR_PATTERNS = [
+	/Missing ABI definition for (\S+)/,
+	/Missing type for action (\S+?):/,
+	/Contract \((\S+?)\) does not have an action named/,
+	/does not exist on the ABI provided/,
+	/Encoding error at /
+];
+
+export function getStaleContract(error: unknown): string | undefined {
+	const message = error instanceof Error ? error.message : String(error);
+	for (const pattern of ABI_ERROR_PATTERNS) {
+		const match = message.match(pattern);
+		if (match) return match[1];
+	}
+	return undefined;
+}
+
 const TTL = 1000 * 60 * 60;
 const cache = new Map<string, { contract: Contract; expires: number }>();
 

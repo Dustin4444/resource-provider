@@ -1,5 +1,6 @@
 import { ABICache } from '@wharfkit/abicache';
 import { Name, PackedTransaction, Transaction } from '@wharfkit/antelope';
+import type { TransactionHeader } from '@wharfkit/antelope';
 import { SigningRequest } from '@wharfkit/signing-request';
 import type { Static } from 'elysia';
 
@@ -89,4 +90,9 @@ export async function createSigningRequest(
 	}
 
 	throw new Error('No valid request found');
+}
+
+export async function getTransactionHeader(expireSeconds = 300): Promise<TransactionHeader> {
+	const info = await getClient().v1.chain.get_info();
+	return info.getTransactionHeader(expireSeconds);
 }
