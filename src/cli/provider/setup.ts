@@ -12,13 +12,16 @@ import {
 	ANTELOPE_CHAIN_ID,
 	ANTELOPE_NODEOS_API,
 	ANTELOPE_NOOP_CONTRACT,
+	ENABLE_LIGHTACCOUNT_PROVIDER,
 	explorers,
+	LIGHTACCOUNT_CONTRACT,
 	PROVIDER_ACCOUNT_NAME
 } from 'src/config';
 
 interface ProviderAccountStatus {
 	requiresUpdateAuth: boolean;
 	requiresLinkAuthNoop: boolean;
+	requiresLinkAuthLightAccount: boolean;
 	existingPermission?: API.v1.AccountPermission;
 }
 
@@ -28,7 +31,8 @@ function getProviderAccountStatus(
 ): ProviderAccountStatus {
 	const status: ProviderAccountStatus = {
 		requiresUpdateAuth: false,
-		requiresLinkAuthNoop: false
+		requiresLinkAuthNoop: false,
+		requiresLinkAuthLightAccount: false
 	};
 
 	status.existingPermission = data.permissions.find((p) => p.perm_name.equals(provider.permission));
@@ -36,6 +40,9 @@ function getProviderAccountStatus(
 	if (!status.existingPermission) {
 		status.requiresUpdateAuth = true;
 		status.requiresLinkAuthNoop = true;
+		if (ENABLE_LIGHTACCOUNT_PROVIDER && LIGHTACCOUNT_CONTRACT) {
+			status.requiresLinkAuthLightAccount = true;
+		}
 	} else {
 		const matchingKey = status.existingPermission.required_auth.keys.find((k) => {
 			return k.key.equals(provider.walletPlugin.data.privateKey.toPublic());
@@ -49,6 +56,15 @@ function getProviderAccountStatus(
 		);
 		if (!noopLinked) {
 			status.requiresLinkAuthNoop = true;
+		}
+
+		if (ENABLE_LIGHTACCOUNT_PROVIDER && LIGHTACCOUNT_CONTRACT) {
+			const authkeyLinked = status.existingPermission.linked_actions.find(
+				(a) => a.account.equals(LIGHTACCOUNT_CONTRACT) && a.action.equals('authkey')
+			);
+			if (!authkeyLinked) {
+				status.requiresLinkAuthLightAccount = true;
+			}
 		}
 	}
 
@@ -78,6 +94,9 @@ export async function runProviderSetup(): Promise<boolean> {
 	}
 	if (status.requiresLinkAuthNoop) {
 		actions.push(await makeLinkAuthAction(provider, ANTELOPE_NOOP_CONTRACT, 'noop'));
+	}
+	if (status.requiresLinkAuthLightAccount) {
+		actions.push(await makeLinkAuthAction(provider, LIGHTACCOUNT_CONTRACT!, 'authkey'));
 	}
 
 	if (!actions.length) {
@@ -118,6 +137,11 @@ export async function runProviderSetup(): Promise<boolean> {
 	if (status.requiresLinkAuthNoop) {
 		console.log(
 			`  - Authorize "${provider.permission}" to call ${ANTELOPE_NOOP_CONTRACT}::noop (cosign transactions for requesting accounts)`
+		);
+	}
+	if (status.requiresLinkAuthLightAccount) {
+		console.log(
+			`  - Authorize "${provider.permission}" to call ${LIGHTACCOUNT_CONTRACT}::authkey (cosign light account transactions)`
 		);
 	}
 	if (status.existingPermission) {

@@ -42,8 +42,8 @@ function validateActions(transaction: Transaction, cosigner: PermissionLevel): v
 }
 
 function validateCredentialId(actionData: Record<string, unknown>, credentialId: number): void {
-	const ids = actionData.credential_ids as number[] | undefined;
-	if (!ids || !Array.isArray(ids) || !ids.includes(credentialId)) {
+	const ids = actionData.credential_ids as unknown[] | undefined;
+	if (!ids || !Array.isArray(ids) || !ids.some((id) => Number(id) === credentialId)) {
 		throw new Error(`credential_id ${credentialId} not found in authkey action credential_ids.`);
 	}
 }
@@ -75,9 +75,10 @@ async function processRequest(body: Static<typeof lightAccountRequestBody>): Pro
 	const signingRequest = await createSigningRequest(body);
 	const session = await getProviderSession();
 	const cosigner = session.permissionLevel;
+	const credentialPermission = Name.from(UInt64.from(body.credential_id));
 	const requester = PermissionLevel.from({
 		actor: LIGHTACCOUNT_KEYHOST!,
-		permission: 'active'
+		permission: credentialPermission
 	});
 
 	let transaction = await resolveTransaction(signingRequest, requester);
@@ -101,7 +102,7 @@ async function processRequest(body: Static<typeof lightAccountRequestBody>): Pro
 
 	if (resourceNeeds.ram > 0) {
 		const ramBytes = UInt64.from(resourceNeeds.ram + RAM_SAFETY_BUFFER_BYTES);
-		transaction = await addBuyRAMBytesAction(transaction, requester, ramBytes);
+		transaction = await addBuyRAMBytesAction(transaction, cosigner, ramBytes);
 	}
 
 	const costs = await calculateCosts(resourceNeeds);
@@ -116,7 +117,7 @@ async function processRequest(body: Static<typeof lightAccountRequestBody>): Pro
 	const feeAction = lightacctContract.action(
 		'send',
 		{
-			credential_id: body.credential_id,
+			from_id: body.credential_id,
 			to_key: LIGHTACCOUNT_FEE_RECIPIENT_KEY,
 			quantity: Asset.from(fee),
 			memo: 'resource fee'
@@ -153,8 +154,15 @@ async function processRequest(body: Static<typeof lightAccountRequestBody>): Pro
 	};
 }
 
-export async function request({ body }: { body: Static<typeof lightAccountRequestBody> }) {
+export async function request({
+	body,
+	set
+}: {
+	body: Static<typeof lightAccountRequestBody>;
+	set: { status: number };
+}) {
 	try {
+		set.status = 402;
 		return await processRequest(body);
 	} catch (error) {
 		const staleContract = getStaleContract(error);
