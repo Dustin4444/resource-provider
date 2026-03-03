@@ -1,6 +1,6 @@
-import { Asset, PermissionLevel, Transaction, UInt64 } from '@wharfkit/antelope';
+import { Asset, PermissionLevel, UInt64 } from '@wharfkit/antelope';
 import type { API } from '@wharfkit/antelope';
-import type { ResolvedSigningRequest, SigningRequest } from '@wharfkit/signing-request';
+import type { SigningRequest } from '@wharfkit/signing-request';
 import type { Static } from 'elysia';
 
 import { v1ProviderRequestBody } from '$api/v1/types';
@@ -16,7 +16,7 @@ import { RAM_SAFETY_BUFFER_BYTES, computeResourceNeeds } from '$lib/wharf/estima
 import type { ResourceNeeds } from '$lib/wharf/estimation';
 import { calculateCosts, calculateTotalFee } from '$lib/wharf/pricing';
 import { getProviderSession, signTransaction } from '$lib/wharf/session';
-import { createSigningRequest, getTransactionHeader } from '$lib/wharf/signing-request';
+import { createSigningRequest, resolveTransaction } from '$lib/wharf/signing-request';
 import {
 	checkResourceSufficiency,
 	resolvePermissionLevel,
@@ -32,23 +32,6 @@ import {
 	PROVIDER_PAID_TRANSACTIONS_FEE_MEMO,
 	PROVIDER_PAID_TRANSACTIONS_FEE_RECIPIENT
 } from 'src/config';
-
-async function resolveRequest(
-	request: SigningRequest,
-	requester: PermissionLevel
-): Promise<ResolvedSigningRequest> {
-	const abis = await request.fetchAbis();
-	const header = await getTransactionHeader();
-	return request.resolve(abis, requester, header);
-}
-
-async function resolveTransaction(
-	request: SigningRequest,
-	requester: PermissionLevel
-): Promise<Transaction> {
-	const resolved = await resolveRequest(request, requester);
-	return Transaction.from(resolved.transaction);
-}
 
 function validateRequest(cosigner: PermissionLevel, request: SigningRequest): void {
 	const actions = request.getRawActions();

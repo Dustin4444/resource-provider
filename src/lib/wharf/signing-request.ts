@@ -1,12 +1,12 @@
 import { ABICache } from '@wharfkit/abicache';
-import { Name, PackedTransaction, Transaction } from '@wharfkit/antelope';
+import { Name, PackedTransaction, PermissionLevel, Transaction } from '@wharfkit/antelope';
 import type { TransactionHeader } from '@wharfkit/antelope';
 import { SigningRequest } from '@wharfkit/signing-request';
+import type { ResolvedSigningRequest } from '@wharfkit/signing-request';
 import type { Static } from 'elysia';
 
 import { getClient } from './client';
 
-import type { v1ProviderRequestBody } from '$api/v1/types';
 import { generalLog } from '$lib/logger';
 import type { TPackedTransaction, TTransaction } from '$lib/types';
 
@@ -66,22 +66,23 @@ export async function createSigningRequestFromTransaction(
 	);
 }
 
-export async function createSigningRequest(
-	body: Static<typeof v1ProviderRequestBody>
-): Promise<SigningRequest> {
+export interface SigningRequestInput {
+	request?: string;
+	transaction?: Static<typeof TTransaction>;
+	packedTransaction?: Static<typeof TPackedTransaction>;
+}
+
+export async function createSigningRequest(body: SigningRequestInput): Promise<SigningRequest> {
 	generalLog.debug('createSigningRequest', { body });
 	try {
-		// EEP-8 Specification: Process based on ESR payload
 		if (body.request) {
 			return await createSigningRequestFromString(body.request);
 		}
 
-		// EEP-8 Specification: Process based on deserialized transaction
 		if (body.transaction) {
 			return await createSigningRequestFromTransaction(body.transaction);
 		}
 
-		// EEP-8 Specification: Process based on packed transaction
 		if (body.packedTransaction) {
 			return createSigningRequestFromPackedTransaction(body.packedTransaction);
 		}
@@ -95,4 +96,21 @@ export async function createSigningRequest(
 export async function getTransactionHeader(expireSeconds = 300): Promise<TransactionHeader> {
 	const info = await getClient().v1.chain.get_info();
 	return info.getTransactionHeader(expireSeconds);
+}
+
+export async function resolveRequest(
+	request: SigningRequest,
+	requester: PermissionLevel
+): Promise<ResolvedSigningRequest> {
+	const abis = await request.fetchAbis();
+	const header = await getTransactionHeader();
+	return request.resolve(abis, requester, header);
+}
+
+export async function resolveTransaction(
+	request: SigningRequest,
+	requester: PermissionLevel
+): Promise<Transaction> {
+	const resolved = await resolveRequest(request, requester);
+	return Transaction.from(resolved.transaction);
 }
