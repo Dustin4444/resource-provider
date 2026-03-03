@@ -1,4 +1,4 @@
-import { API, Int64, KeyWeight, PrivateKey, Session } from '@wharfkit/session';
+import { API, Authority, Int64, KeyWeight, PrivateKey, Session } from '@wharfkit/session';
 
 import { getContract } from '$lib/wharf/contracts';
 import { ANTELOPE_SYSTEM_CONTRACT } from 'src/config';
@@ -29,12 +29,12 @@ export async function makeUpdateAuthAction(
 		account: manager.actor,
 		permission: manager.permission,
 		parent: 'active',
-		auth: {
+		auth: Authority.from({
 			threshold: 1,
 			keys,
 			accounts: [],
 			waits: []
-		}
+		})
 	};
 	return systemContract.action('updateauth', params);
 }
