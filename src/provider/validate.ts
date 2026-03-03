@@ -1,3 +1,5 @@
+import { PrivateKey } from '@wharfkit/antelope';
+
 import { providerLog } from '$lib/logger';
 import { getClient } from '$lib/wharf/client';
 import { getProviderSession } from '$lib/wharf/session';
@@ -17,6 +19,15 @@ export async function validateProviderAccount(): Promise<boolean> {
 	if (!permission) {
 		providerLog.error(
 			`Provider account "${session.actor}" is missing the "${session.permission}" permission. Run "provider setup" to configure the account.`
+		);
+		return false;
+	}
+
+	const configuredPublicKey = PrivateKey.from(session.walletPlugin.data.privateKey).toPublic();
+	const keyMatch = permission.required_auth.keys.some((k) => k.key.equals(configuredPublicKey));
+	if (!keyMatch) {
+		providerLog.error(
+			`Provider private key does not match any key on the "${session.permission}" permission. The configured public key is ${configuredPublicKey}. Run "provider setup" to update the permission.`
 		);
 		return false;
 	}
